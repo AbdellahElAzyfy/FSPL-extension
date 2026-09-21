@@ -1,0 +1,20 @@
+[
+  { "splTeamId": 1, "shortName": "AHL", "name": "Al Ahli", "sofascoreTeamId": 34469 },
+  { "splTeamId": 2, "shortName": "FAT", "name": "Al Fateh", "sofascoreTeamId": 56023 },
+  { "splTeamId": 3, "shortName": "FYH", "name": "Al Fayha", "sofascoreTeamId": 168094 },
+  { "splTeamId": 4, "shortName": "HIL", "name": "Al Hilal", "sofascoreTeamId": 21895 },
+  { "splTeamId": 5, "shortName": "ETT", "name": "Al Ettifaq", "sofascoreTeamId": 34318 },
+  { "splTeamId": 6, "shortName": "ITT", "name": "Al Ittihad", "sofascoreTeamId": 34315 },
+  { "splTeamId": 7, "shortName": "KLJ", "name": "Al Khaleej", "sofascoreTeamId": 167228 },
+  { "splTeamId": 8, "shortName": "NAS", "name": "Al Nassr", "sofascoreTeamId": 23400 },
+  { "splTeamId": 9, "shortName": "RIY", "name": "Al Riyadh", "sofascoreTeamId": 168088 },
+  { "splTeamId": 10, "shortName": "SHB", "name": "Al Shabab", "sofascoreTeamId": 34313 },
+  { "splTeamId": 11, "shortName": "TWN", "name": "Al Taawoun", "sofascoreTeamId": 56021 },
+  { "splTeamId": 12, "shortName": "QAD", "name": "Al Qadsiah", "sofascoreTeamId": 56027 },
+  { "splTeamId": 13, "shortName": "KLD", "name": "Al Kholood", "sofascoreTeamId": 269199 },
+  { "splTeamId": 14, "shortName": "NEO", "name": "NEOM SC", "sofascoreTeamId": 530631 },
+  { "splTeamId": 15, "shortName": "HAZ", "name": "Al Hazem", "sofascoreTeamId": 168086 },
+  { "splTeamId": 16, "shortName": "ABH", "name": "Abha", "sofascoreTeamId": 168090 },
+  { "splTeamId": 17, "shortName": "FSL", "name": "Al Faisaly", "sofascoreTeamId": 56035 },
+  { "splTeamId": 18, "shortName": "DIR", "name": "Diriyah Club", "sofascoreTeamId": 853574 }
+]

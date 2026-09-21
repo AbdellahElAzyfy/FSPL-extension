@@ -1,0 +1,38 @@
+name: Update team xG data
+
+on:
+  schedule:
+    # Daily; the script only does work when new finished matches exist,
+    # so running more often than the actual GW cadence costs nothing.
+    - cron: "17 6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update-team-xg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Fetch team xG snapshot
+        run: npm run fetch:xg
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/team-xg.json data/team-xg-state.json
+          git diff --cached --quiet || git commit -m "Update team xG data"
+          git push
