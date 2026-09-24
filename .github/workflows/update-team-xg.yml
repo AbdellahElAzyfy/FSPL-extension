@@ -1,10 +1,9 @@
 name: Update team xG data
 
 on:
-  schedule:
-    # Daily; the script only does work when new finished matches exist,
-    # so running more often than the actual GW cadence costs nothing.
-    - cron: "17 6 * * *"
+  # No schedule: Sofascore 403s GitHub Actions runners, so the daily update runs
+  # locally via Windows Task Scheduler (scripts/update-xg-local.ps1). Kept for
+  # manual runs in case the block is lifted.
   workflow_dispatch: {}
 
 permissions:
