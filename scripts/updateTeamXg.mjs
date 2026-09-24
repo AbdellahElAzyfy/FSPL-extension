@@ -38,7 +38,9 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function fetchJson(page, url) {
   const response = await page.goto(url, { waitUntil: "domcontentloaded" });
   if (!response || !response.ok()) {
-    throw new Error(`Request failed (${response?.status()}) for ${url}`);
+    const error = new Error(`Request failed (${response?.status()}) for ${url}`);
+    error.status = response?.status();
+    throw error;
   }
   const bodyText = await page.evaluate(() => document.body.innerText);
   return JSON.parse(bodyText);
@@ -49,8 +51,11 @@ async function fetchRoundEvents(page, round) {
   try {
     const data = await fetchJson(page, url);
     return data.events ?? [];
-  } catch {
-    return null; // round doesn't exist (season not that long yet, or over)
+  } catch (err) {
+    // Only a 404 means the round doesn't exist (season not that long yet, or over).
+    // Anything else (e.g. a 403 bot block) must fail the run, not pass as "no more rounds".
+    if (err.status === 404) return null;
+    throw err;
   }
 }
 
@@ -112,6 +117,10 @@ async function main() {
     }
   } finally {
     await browser.close();
+  }
+
+  if (roundsSeen.size === 0) {
+    throw new Error("No rounds fetched from Sofascore — refusing to overwrite data with stale output");
   }
 
   await mkdir(DATA_DIR, { recursive: true });
