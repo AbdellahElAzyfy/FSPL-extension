@@ -1,5 +1,5 @@
 import { dataStore } from "./dataStore";
-import { extractTeamCodeFromShirtSrc } from "./shirtCode";
+import { extractTeamCodeFromShirtSrc, isGoalkeeperShirt } from "./shirtCode";
 import { renderFixtureStrip } from "../ui/fixtureStrip";
 
 const INJECTED_MARKER = "data-spl-fh-injected";
@@ -33,7 +33,14 @@ export function scanForPlayerRows(): void {
     const fixtures = dataStore.getFixturesForTeam(teamId);
     if (fixtures.length === 0) return;
 
-    row.appendChild(renderFixtureStrip(fixtures));
+    // The name div is the only element carrying an "element" attribute (the
+    // site leaks its player prop onto the DOM as element="[object Object]").
+    const playerName = button.querySelector("[element]")?.textContent?.trim();
+    const positionGroup = playerName
+      ? dataStore.positionGroupFor(teamId, playerName, isGoalkeeperShirt(img.currentSrc || img.src))
+      : null;
+
+    row.appendChild(renderFixtureStrip(fixtures, positionGroup, dataStore.difficulty));
     row.setAttribute(INJECTED_MARKER, "true");
   });
 }

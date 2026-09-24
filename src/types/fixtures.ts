@@ -18,8 +18,17 @@ export interface Fixture {
   finished: boolean;
 }
 
+/** A player ("element" in the FPL-style API). element_type: 1 GKP, 2 DEF, 3 MID, 4 FWD. */
+export interface Player {
+  id: number;
+  web_name: string;
+  team: number;
+  element_type: number;
+}
+
 export interface Bootstrap {
   teams: Team[];
+  elements: Player[];
 }
 
 export type TeamFixtureMap = Map<number, ResolvedFixture[]>;

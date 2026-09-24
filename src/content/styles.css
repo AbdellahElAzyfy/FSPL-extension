@@ -18,3 +18,10 @@
   background-color: #e7e7e7;
   color: #131924;
 }
+
+/* Fixture difficulty: 1 = easy (green) ... 5 = hard (red). */
+.spl-fh-fixture-cell[data-fdr="1"] { background-color: #1e8449; color: #ffffff; }
+.spl-fh-fixture-cell[data-fdr="2"] { background-color: #82d48f; color: #131924; }
+.spl-fh-fixture-cell[data-fdr="3"] { background-color: #f3e08a; color: #131924; }
+.spl-fh-fixture-cell[data-fdr="4"] { background-color: #f08a7a; color: #131924; }
+.spl-fh-fixture-cell[data-fdr="5"] { background-color: #b3261e; color: #ffffff; }

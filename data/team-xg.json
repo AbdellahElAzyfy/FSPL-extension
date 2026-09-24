@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T09:39:56.429Z",
+  "generatedAt": "2026-09-24T12:02:10.071Z",
   "sofascoreTournamentId": 955,
   "sofascoreSeasonId": 99275,
   "roundsSeen": [
@@ -38,6 +38,12 @@
     33,
     34
   ],
+  "league": {
+    "matchesPlayed": 63,
+    "avgXg": 1.53,
+    "homeAvgXg": 1.59,
+    "awayAvgXg": 1.47
+  },
   "teams": [
     {
       "splTeamId": 1,

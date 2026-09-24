@@ -6,9 +6,14 @@
 // Goalkeepers use a separate kit variant suffix, e.g. shirt_15209_1-110.webp
 // (team code 15209, GK kit "_1") — the trailing "_\d+" is optional.
 const SHIRT_SRC_PATTERN = /shirt_(\d+)(?:_\d+)?-/;
+const GK_SHIRT_PATTERN = /shirt_\d+_1-/;
 
 export function extractTeamCodeFromShirtSrc(src: string): number | null {
   const match = SHIRT_SRC_PATTERN.exec(src);
   if (!match) return null;
   return Number(match[1]);
+}
+
+export function isGoalkeeperShirt(src: string): boolean {
+  return GK_SHIRT_PATTERN.test(src);
 }

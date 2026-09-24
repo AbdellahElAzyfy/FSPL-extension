@@ -157,11 +157,23 @@ async function main() {
     })
     .sort((a, b) => a.splTeamId - b.splTeamId);
 
+  // League-wide per-match averages, used by the extension to normalise team
+  // ratings and to derive the home/away advantage.
+  const matches = Object.values(state.events);
+  const homeAvgXg = matches.reduce((sum, m) => sum + m.homeXg, 0) / matches.length;
+  const awayAvgXg = matches.reduce((sum, m) => sum + m.awayXg, 0) / matches.length;
+
   const output = {
     generatedAt: new Date().toISOString(),
     sofascoreTournamentId: SOFASCORE_TOURNAMENT_ID,
     sofascoreSeasonId: SOFASCORE_SEASON_ID,
     roundsSeen: [...roundsSeen].sort((a, b) => a - b),
+    league: {
+      matchesPlayed: matches.length,
+      avgXg: round2((homeAvgXg + awayAvgXg) / 2),
+      homeAvgXg: round2(homeAvgXg),
+      awayAvgXg: round2(awayAvgXg),
+    },
     teams,
   };
 
