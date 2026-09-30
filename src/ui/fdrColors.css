@@ -1,0 +1,7 @@
+/* Fixture difficulty colours, shared by the in-page fixture strip and the
+   season page. 1 = easy ... 5 = hard. */
+.spl-fh-fdr[data-fdr="1"] { background-color: #146c3a; color: #ffffff; } /* dark green */
+.spl-fh-fdr[data-fdr="2"] { background-color: #3fc06a; color: #131924; } /* green */
+.spl-fh-fdr[data-fdr="3"] { background-color: #c4c7cc; color: #131924; } /* gray */
+.spl-fh-fdr[data-fdr="4"] { background-color: #ff8fa3; color: #131924; } /* pink / light red */
+.spl-fh-fdr[data-fdr="5"] { background-color: #5c0a14; color: #ffffff; } /* very dark red */

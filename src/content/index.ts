@@ -1,6 +1,13 @@
 import "./styles.css";
+import "../ui/fdrColors.css";
 import { dataStore } from "./dataStore";
 import { scanForPlayerRows } from "./playerRowInjector";
+import { ensureDifficultyTab } from "./difficultyTab";
+
+function scanPage(): void {
+  scanForPlayerRows();
+  ensureDifficultyTab();
+}
 
 async function bootstrap(): Promise<void> {
   try {
@@ -10,12 +17,12 @@ async function bootstrap(): Promise<void> {
     return;
   }
 
-  scanForPlayerRows();
+  scanPage();
 
-  // SPA re-renders player rows on every navigation/filter change, so
-  // keep re-scanning on DOM mutations. scanForPlayerRows() is
-  // idempotent per-row (marked via data attribute), so this is cheap.
-  const observer = new MutationObserver(() => scanForPlayerRows());
+  // SPA re-renders player rows and the nav on every navigation/filter
+  // change, so keep re-scanning on DOM mutations. Both scans are
+  // idempotent (marked via data attributes), so this is cheap.
+  const observer = new MutationObserver(() => scanPage());
   observer.observe(document.body, { childList: true, subtree: true });
 }
 

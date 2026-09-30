@@ -1,10 +1,12 @@
 import type { Bootstrap, Fixture, Team, TeamFixtureMap } from "../types/fixtures";
 import type { TeamXgSnapshot } from "../types/teamXg";
 
-// Both confirmed public (no auth/cookies needed) via curl against the
-// live site on 2026-09-17.
+// All confirmed public (no auth/cookies needed) via curl against the
+// live site on 2026-09-17. Paths are relative for content scripts (same
+// origin as the site); extension pages pass an absolute `origin`.
 const BOOTSTRAP_ENDPOINT = "/api/bootstrap-static/";
 const FUTURE_FIXTURES_ENDPOINT = "/api/fixtures/?future=1";
+const ALL_FIXTURES_ENDPOINT = "/api/fixtures/";
 
 async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(path);
@@ -14,12 +16,16 @@ async function fetchJson<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function fetchBootstrap(): Promise<Bootstrap> {
-  return fetchJson<Bootstrap>(BOOTSTRAP_ENDPOINT);
+export async function fetchBootstrap(origin = ""): Promise<Bootstrap> {
+  return fetchJson<Bootstrap>(origin + BOOTSTRAP_ENDPOINT);
 }
 
 export async function fetchFutureFixtures(): Promise<Fixture[]> {
   return fetchJson<Fixture[]>(FUTURE_FIXTURES_ENDPOINT);
+}
+
+export async function fetchAllFixtures(origin = ""): Promise<Fixture[]> {
+  return fetchJson<Fixture[]>(origin + ALL_FIXTURES_ENDPOINT);
 }
 
 // Team xG snapshot, refreshed daily by scripts/update-xg-local.ps1 and served

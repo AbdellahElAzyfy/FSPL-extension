@@ -11,7 +11,7 @@ export interface Team {
 
 export interface Fixture {
   id: number;
-  event: number;
+  event: number; // null in the API for unscheduled (postponed, no new date) fixtures
   kickoff_time: string | null;
   team_a: number;
   team_h: number;
@@ -26,9 +26,17 @@ export interface Player {
   element_type: number;
 }
 
+/** A gameweek ("round" on this site). */
+export interface GameEvent {
+  id: number;
+  finished: boolean;
+  deadline_time: string;
+}
+
 export interface Bootstrap {
   teams: Team[];
   elements: Player[];
+  events: GameEvent[];
 }
 
 export type TeamFixtureMap = Map<number, ResolvedFixture[]>;

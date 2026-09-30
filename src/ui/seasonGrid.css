@@ -1,0 +1,159 @@
+/* Season grid component. Everything is scoped under .spl-fh-season because it
+   is also mounted inside the SPL Fantasy site, whose global styles we must
+   neither leak into nor depend on. */
+.spl-fh-season {
+  --fh-bg: #131924;
+  --fh-surface: #1c2433;
+  --fh-surface-2: #252f41;
+  --fh-border: #2e3a4f;
+  --fh-text: #f2f4f8;
+  --fh-muted: #9aa5b8;
+  --fh-accent: #b7f400; /* the site's lime */
+
+  /* Round columns always run left -> right, even on the RTL Arabic site. */
+  direction: ltr;
+  box-sizing: border-box;
+  width: 100%;
+  color: var(--fh-text);
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+.spl-fh-season *, .spl-fh-season *::before, .spl-fh-season *::after { box-sizing: inherit; }
+
+.spl-fh-season__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.spl-fh-season h2 { margin: 0; font-size: 24px; font-weight: 700; color: var(--fh-text); }
+.spl-fh-season__subtitle { margin: 4px 0 0; color: var(--fh-muted); }
+
+.spl-fh-season__controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+.spl-fh-season__segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--fh-surface);
+  border: 1px solid var(--fh-border);
+}
+.spl-fh-season__segmented button {
+  margin: 0;
+  border: 0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--fh-muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.spl-fh-season__segmented button span { font-weight: 400; font-size: 12px; opacity: 0.8; }
+.spl-fh-season__segmented button[aria-checked="true"] { background: var(--fh-accent); color: var(--fh-bg); }
+.spl-fh-season__segmented button:focus-visible,
+.spl-fh-season select:focus-visible { outline: 2px solid var(--fh-accent); outline-offset: 2px; }
+
+.spl-fh-season__horizon { display: flex; align-items: center; gap: 8px; color: var(--fh-muted); }
+.spl-fh-season select {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--fh-border);
+  background: var(--fh-surface);
+  color: var(--fh-text);
+  font: inherit;
+}
+
+.spl-fh-season__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: var(--fh-muted);
+  font-size: 12px;
+}
+.spl-fh-season__legend i {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 20px;
+  border-radius: 4px;
+  font-style: normal;
+  font-weight: 700;
+}
+.spl-fh-season__note { margin-left: 12px; }
+
+.spl-fh-season__table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--fh-border);
+  border-radius: 8px;
+  background: var(--fh-bg);
+}
+
+.spl-fh-season table { border-collapse: collapse; width: 100%; margin: 0; }
+.spl-fh-season th, .spl-fh-season td { padding: 0; border: 0; border-bottom: 1px solid var(--fh-border); }
+
+.spl-fh-season thead th {
+  padding: 8px 4px;
+  background: var(--fh-surface-2);
+  color: var(--fh-text);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+.spl-fh-season thead th small { display: block; font-size: 11px; font-weight: 400; color: var(--fh-muted); }
+
+.spl-fh-season .spl-fh-season__team {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 1%; /* shrink to content; spare width goes to the round columns */
+  min-width: 150px;
+  padding: 0 12px;
+  background: var(--fh-surface);
+  color: var(--fh-text);
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.spl-fh-season thead .spl-fh-season__team { background: var(--fh-surface-2); z-index: 2; }
+
+.spl-fh-season .spl-fh-season__avg {
+  width: 1%;
+  min-width: 52px;
+  padding: 0 8px;
+  background: var(--fh-surface);
+  color: var(--fh-muted);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.spl-fh-season thead .spl-fh-season__avg { background: var(--fh-surface-2); color: var(--fh-text); }
+
+.spl-fh-season__fixture {
+  min-width: 56px;
+  height: 36px;
+  padding: 2px !important;
+  vertical-align: middle;
+}
+.spl-fh-season__chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+/* Unrated fallback only — rated chips take their colour from fdrColors.css. */
+.spl-fh-season__chip:not([data-fdr]) { background: var(--fh-surface-2); }
+/* Double round: two stacked half-height chips. */
+.spl-fh-season__chip + .spl-fh-season__chip { margin-top: 2px; }
+.spl-fh-season__chip:not(:only-child) { min-height: 15px; font-size: 10px; }
+
+.spl-fh-season__blank { color: var(--fh-muted); text-align: center; }

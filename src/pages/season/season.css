@@ -1,0 +1,13 @@
+/* Page shell only; the grid's own styles live in src/ui/seasonGrid.css. */
+:root { color-scheme: dark; }
+
+body {
+  margin: 0;
+  padding: 24px 16px 40px;
+  background: #131924;
+  color: #f2f4f8;
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+#app { max-width: 1400px; margin: 0 auto; }
+#status { color: #9aa5b8; }

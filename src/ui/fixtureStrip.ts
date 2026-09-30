@@ -25,6 +25,7 @@ export function renderFixtureStrip(
 
     const rating = positionGroup && difficulty?.getDifficulty(opponent.id, isHome, positionGroup);
     if (rating) {
+      cell.classList.add("spl-fh-fdr");
       cell.dataset.fdr = String(rating);
       cell.title += ` — difficulty ${rating}/5`;
     }

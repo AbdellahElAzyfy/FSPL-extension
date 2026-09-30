@@ -1,6 +1,7 @@
 import { buildTeamFixtureMap, fetchBootstrap, fetchFutureFixtures, fetchTeamXg } from "../api/fixtures";
 import { DifficultyModel, type PositionGroup } from "../fdr/difficulty";
 import type { ResolvedFixture, Team } from "../types/fixtures";
+import type { SeasonGridInput } from "../ui/seasonGrid";
 
 const GOALKEEPER_TYPE = 1;
 const ATTACKING_TYPES = new Set([3, 4]); // MID, FWD
@@ -12,6 +13,7 @@ class DataStore {
   // "teamId|web_name" -> element_types of every player with that name in that team
   private playerTypesByTeamAndName = new Map<string, number[]>();
   private difficultyModel: DifficultyModel | null = null;
+  private seasonInput: SeasonGridInput | null = null;
   private loadPromise: Promise<void> | null = null;
 
   load(): Promise<void> {
@@ -38,10 +40,24 @@ class DataStore {
     // xG lives outside the site; if it can't be fetched, chips still render
     // without difficulty colours.
     try {
-      this.difficultyModel = new DifficultyModel(await fetchTeamXg());
+      const xg = await fetchTeamXg();
+      this.difficultyModel = new DifficultyModel(xg);
+      // ?future=1 already holds every unplayed fixture, which is all the season grid needs.
+      this.seasonInput = {
+        teams: bootstrap.teams,
+        events: bootstrap.events,
+        fixtures,
+        model: this.difficultyModel,
+        xgGeneratedAt: xg.generatedAt,
+      };
     } catch (err) {
       console.warn("[SPL Fantasy Helper] team xG unavailable, skipping difficulty colours", err);
     }
+  }
+
+  /** Everything the season difficulty grid needs; null if xG couldn't be loaded. */
+  get seasonGridInput(): SeasonGridInput | null {
+    return this.seasonInput;
   }
 
   teamIdForShirtCode(shirtCode: number): number | undefined {
