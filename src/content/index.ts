@@ -20,10 +20,17 @@ async function bootstrap(): Promise<void> {
   scanPage();
 
   // SPA re-renders player rows and the nav on every navigation/filter
-  // change, so keep re-scanning on DOM mutations. Both scans are
-  // idempotent (marked via data attributes), so this is cheap.
+  // change, so keep re-scanning on DOM mutations. Swapping a player often
+  // only changes a row's name text and shirt src in place, so watch text
+  // and src changes too. Both scans are idempotent, so this is cheap.
   const observer = new MutationObserver(() => scanPage());
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ["src"],
+  });
 }
 
 bootstrap();
