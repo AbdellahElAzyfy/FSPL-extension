@@ -157,3 +157,101 @@
 .spl-fh-season__chip:not(:only-child) { min-height: 15px; font-size: 10px; }
 
 .spl-fh-season__blank { color: var(--fh-muted); text-align: center; }
+
+/* ---- Ratings editor ---- */
+.spl-fh-season__edit-toggle,
+.spl-fh-season__editor-actions button,
+.spl-fh-season__row-reset {
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--fh-border);
+  background: var(--fh-surface);
+  color: var(--fh-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.spl-fh-season__edit-toggle[aria-expanded="true"] { background: var(--fh-accent); color: var(--fh-bg); border-color: var(--fh-accent); }
+.spl-fh-season__edit-toggle:hover,
+.spl-fh-season__editor-actions button:hover,
+.spl-fh-season__row-reset:hover { border-color: var(--fh-muted); }
+.spl-fh-season__edit-toggle:focus-visible,
+.spl-fh-season__editor-actions button:focus-visible,
+.spl-fh-season__row-reset:focus-visible,
+.spl-fh-season__link:focus-visible,
+.spl-fh-season__picker button:focus-visible { outline: 2px solid var(--fh-accent); outline-offset: 2px; }
+
+.spl-fh-season__editor {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--fh-border);
+  border-radius: 8px;
+  background: var(--fh-surface);
+}
+.spl-fh-season__editor[hidden] { display: none; }
+.spl-fh-season__editor-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 12px;
+}
+.spl-fh-season__editor-head p { flex: 1 1 420px; margin: 0; color: var(--fh-muted); font-size: 13px; }
+.spl-fh-season__editor-head strong { color: var(--fh-text); font-weight: 600; }
+.spl-fh-season__editor-actions { display: flex; gap: 8px; }
+.spl-fh-season__row-reset { padding: 3px 10px; font-size: 12px; }
+
+.spl-fh-season__export {
+  display: block;
+  width: 100%;
+  height: 160px;
+  margin: 0 0 12px;
+  padding: 8px;
+  border: 1px solid var(--fh-border);
+  border-radius: 6px;
+  background: var(--fh-bg);
+  color: var(--fh-text);
+  font: 12px/1.4 ui-monospace, Consolas, monospace;
+}
+.spl-fh-season__export[hidden] { display: none; }
+
+.spl-fh-season__editor-table td { padding: 6px 8px; vertical-align: middle; }
+.spl-fh-season__editor-table thead th { padding: 6px 8px; }
+
+.spl-fh-season__picker {
+  display: inline-flex;
+  gap: 3px;
+  padding: 2px;
+  border-radius: 6px;
+}
+/* Edited by the user: lime ring so it stands out from the defaults. */
+.spl-fh-season__picker[data-edited] { box-shadow: 0 0 0 2px var(--fh-accent); }
+.spl-fh-season__picker button {
+  width: 26px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0.28;
+}
+.spl-fh-season__picker button:hover { opacity: 0.7; }
+.spl-fh-season__picker button[aria-checked="true"] { opacity: 1; box-shadow: 0 0 0 2px var(--fh-text); }
+
+.spl-fh-season__link {
+  margin: 0;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+.spl-fh-season__link[aria-pressed="false"] { opacity: 0.3; filter: grayscale(1); }

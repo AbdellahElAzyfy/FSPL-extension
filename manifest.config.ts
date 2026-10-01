@@ -27,11 +27,13 @@ export default defineManifest({
     type: "module",
   },
   // Needed so the standalone difficulty page (an extension origin) can read the
-  // site's public fixtures API. No other permissions are requested.
+  // site's public fixtures API.
   host_permissions: [
     "https://fantasy.spl.com.sa/*",
     "https://*.fantasy.spl.com.sa/*",
   ],
+  // Saves the user's own edits to the team difficulty ratings (chrome.storage.sync).
+  permissions: ["storage"],
   content_scripts: [
     {
       matches: [

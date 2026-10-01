@@ -1,6 +1,8 @@
 import { dataStore } from "./dataStore";
 import { extractTeamCodeFromShirtSrc, isGoalkeeperShirt } from "./shirtCode";
 import { renderFixtureStrip } from "../ui/fixtureStrip";
+import type { DifficultyModel } from "../fdr/difficulty";
+import { getModel } from "../fdr/ratingsStore";
 
 // Which player a row's strip was built for. React reuses row elements when a
 // player is swapped (substitution, transfer), changing only the name and
@@ -8,6 +10,9 @@ import { renderFixtureStrip } from "../ui/fixtureStrip";
 const PLAYER_KEY_ATTR = "data-spl-fh-player";
 const STRIP_SELECTOR = ":scope > .spl-fh-fixture-strip";
 const SHIRT_IMG_SELECTOR = 'picture img[src*="/dist/img/shirts/"]';
+// The ratings model each row's strip was coloured with. The model is replaced
+// whenever ratings change (incl. user edits), so a mismatch means "recolour".
+const coloredWith = new WeakMap<Element, DifficultyModel>();
 
 /**
  * Pick Team and Transfers screens share the same player-row component
@@ -41,16 +46,18 @@ export function scanForPlayerRows(): void {
     const playerName = findPlayerName(button, img);
     const wearsGkShirt = isGoalkeeperShirt(shirtSrc);
     const playerKey = `${teamId}|${playerName}|${wearsGkShirt}`;
-    if (row.getAttribute(PLAYER_KEY_ATTR) === playerKey) return;
+    const model = getModel();
+    if (row.getAttribute(PLAYER_KEY_ATTR) === playerKey && coloredWith.get(row) === model) return;
 
     row.querySelector(STRIP_SELECTOR)?.remove();
     row.setAttribute(PLAYER_KEY_ATTR, playerKey);
+    coloredWith.set(row, model);
 
     const fixtures = dataStore.getFixturesForTeam(teamId);
     if (fixtures.length === 0) return;
 
     const positionGroup = playerName ? dataStore.positionGroupFor(teamId, playerName, wearsGkShirt) : null;
-    row.appendChild(renderFixtureStrip(fixtures, positionGroup, dataStore.difficulty));
+    row.appendChild(renderFixtureStrip(fixtures, positionGroup, model));
   });
 }
 

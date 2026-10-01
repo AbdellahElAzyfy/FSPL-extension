@@ -5,9 +5,9 @@ import type { ResolvedFixture } from "../types/fixtures";
  * Renders a compact strip of the next N fixtures for a player's team,
  * e.g. [NAS] [hil] [FAT] ... — uppercase = home, lowercase = away.
  *
- * Each chip is coloured 1 (easy, green) to 5 (hard, red) by the xG-based
- * difficulty model, rated for the player's position group. If either the
- * position or the xG data is unavailable, chips stay neutral grey.
+ * Each chip is coloured 1 (easy, green) to 5 (hard, red) from the team
+ * ratings (defaults + the user's edits), rated for the player's position
+ * group. If the position can't be determined, chips stay neutral grey.
  */
 export function renderFixtureStrip(
   fixtures: ResolvedFixture[],

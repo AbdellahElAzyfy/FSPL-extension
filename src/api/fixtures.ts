@@ -1,5 +1,4 @@
 import type { Bootstrap, Fixture, Team, TeamFixtureMap } from "../types/fixtures";
-import type { TeamXgSnapshot } from "../types/teamXg";
 
 // All confirmed public (no auth/cookies needed) via curl against the
 // live site on 2026-09-17. Paths are relative for content scripts (same
@@ -26,15 +25,6 @@ export async function fetchFutureFixtures(): Promise<Fixture[]> {
 
 export async function fetchAllFixtures(origin = ""): Promise<Fixture[]> {
   return fetchJson<Fixture[]>(origin + ALL_FIXTURES_ENDPOINT);
-}
-
-// Team xG snapshot, refreshed daily by scripts/update-xg-local.ps1 and served
-// from the repo (raw.githubusercontent.com allows cross-origin reads).
-const TEAM_XG_URL =
-  "https://raw.githubusercontent.com/AbdellahElAzyfy/FSPL-extension/main/data/team-xg.json";
-
-export async function fetchTeamXg(): Promise<TeamXgSnapshot> {
-  return fetchJson<TeamXgSnapshot>(TEAM_XG_URL);
 }
 
 /**

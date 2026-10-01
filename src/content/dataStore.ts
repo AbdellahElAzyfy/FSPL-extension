@@ -1,5 +1,6 @@
-import { buildTeamFixtureMap, fetchBootstrap, fetchFutureFixtures, fetchTeamXg } from "../api/fixtures";
-import { DifficultyModel, type PositionGroup } from "../fdr/difficulty";
+import { buildTeamFixtureMap, fetchBootstrap, fetchFutureFixtures } from "../api/fixtures";
+import type { PositionGroup } from "../fdr/difficulty";
+import { loadRatings } from "../fdr/ratingsStore";
 import type { ResolvedFixture, Team } from "../types/fixtures";
 import type { SeasonGridInput } from "../ui/seasonGrid";
 
@@ -12,7 +13,6 @@ class DataStore {
   private teamFixtureMap: Map<number, ResolvedFixture[]> | null = null;
   // "teamId|web_name" -> element_types of every player with that name in that team
   private playerTypesByTeamAndName = new Map<string, number[]>();
-  private difficultyModel: DifficultyModel | null = null;
   private seasonInput: SeasonGridInput | null = null;
   private loadPromise: Promise<void> | null = null;
 
@@ -24,7 +24,8 @@ class DataStore {
   }
 
   private async doLoad(): Promise<void> {
-    const [bootstrap, fixtures] = await Promise.all([fetchBootstrap(), fetchFutureFixtures()]);
+    // loadRatings never rejects: it falls back to the ratings bundled with the extension.
+    const [bootstrap, fixtures] = await Promise.all([fetchBootstrap(), fetchFutureFixtures(), loadRatings()]);
 
     this.teamsById = new Map(bootstrap.teams.map((t) => [t.id, t]));
     this.teamIdByCode = new Map(bootstrap.teams.map((t) => [t.code, t.id]));
@@ -37,25 +38,11 @@ class DataStore {
       this.playerTypesByTeamAndName.set(key, types);
     }
 
-    // xG lives outside the site; if it can't be fetched, chips still render
-    // without difficulty colours.
-    try {
-      const xg = await fetchTeamXg();
-      this.difficultyModel = new DifficultyModel(xg);
-      // ?future=1 already holds every unplayed fixture, which is all the season grid needs.
-      this.seasonInput = {
-        teams: bootstrap.teams,
-        events: bootstrap.events,
-        fixtures,
-        model: this.difficultyModel,
-        xgGeneratedAt: xg.generatedAt,
-      };
-    } catch (err) {
-      console.warn("[SPL Fantasy Helper] team xG unavailable, skipping difficulty colours", err);
-    }
+    // ?future=1 already holds every unplayed fixture, which is all the season grid needs.
+    this.seasonInput = { teams: bootstrap.teams, events: bootstrap.events, fixtures };
   }
 
-  /** Everything the season difficulty grid needs; null if xG couldn't be loaded. */
+  /** Everything the season difficulty grid needs; null until loaded. */
   get seasonGridInput(): SeasonGridInput | null {
     return this.seasonInput;
   }
@@ -83,10 +70,6 @@ class DataStore {
 
     const groups = new Set(candidates.map((type) => (ATTACKING_TYPES.has(type) ? "attacking" : "defensive")));
     return groups.size === 1 ? [...groups][0] : null;
-  }
-
-  get difficulty(): DifficultyModel | null {
-    return this.difficultyModel;
   }
 }
 

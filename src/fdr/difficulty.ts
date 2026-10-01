@@ -1,64 +1,56 @@
-import type { TeamXgSnapshot } from "../types/teamXg";
+import type { RatingKey, RatingOverrides, TeamRating } from "../types/teamRatings";
 
 export type Difficulty = 1 | 2 | 3 | 4 | 5;
 
 /** Which side of the opponent matters: its defence (for ATT/MID) or its attack (for GK/DEF). */
 export type PositionGroup = "attacking" | "defensive";
 
-// Each team's averages are blended with the league average as if it had also
-// played this many average matches, so small early-season samples stay near neutral.
-const SHRINKAGE_MATCHES = 5;
-
-// Difficulty score (1.00 = league average, higher = harder) -> 1..5 bucket.
-// Signed off against the 2026-09-24 data (see project notes); tune here.
-const BUCKET_UPPER_BOUNDS = [0.8, 0.93, 1.07, 1.2];
-
-interface TeamRating {
-  attack: number; // opponent's xG for, relative to league average
-  defence: number; // opponent's xG against, relative to league average
+export function isDifficulty(value: unknown): value is Difficulty {
+  return typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 5;
 }
 
+/**
+ * Fixture difficulty from team ratings: the default ratings (data/team-ratings.json)
+ * with the user's own edits layered on top. Immutable — a new model is built
+ * whenever the ratings or the user's edits change.
+ */
 export class DifficultyModel {
-  private ratings = new Map<number, TeamRating>();
-  private homeFactor = 1;
-  private awayFactor = 1;
+  private readonly defaults: Map<number, TeamRating>;
+  private readonly overrides: RatingOverrides;
+  readonly updatedAt: string;
 
-  constructor(snapshot: TeamXgSnapshot) {
-    const leagueAvg =
-      snapshot.league?.avgXg ??
-      snapshot.teams.reduce((sum, t) => sum + t.avgXgFor, 0) / snapshot.teams.length;
-
-    if (snapshot.league) {
-      this.homeFactor = snapshot.league.homeAvgXg / leagueAvg;
-      this.awayFactor = snapshot.league.awayAvgXg / leagueAvg;
-    }
-
-    const shrink = (avg: number, n: number) =>
-      (n * avg + SHRINKAGE_MATCHES * leagueAvg) / (n + SHRINKAGE_MATCHES) / leagueAvg;
-
-    for (const team of snapshot.teams) {
-      this.ratings.set(team.splTeamId, {
-        attack: shrink(team.avgXgFor, team.matchesPlayed),
-        defence: shrink(team.avgXgAgainst, team.matchesPlayed),
-      });
-    }
+  constructor(defaults: TeamRating[], overrides: RatingOverrides, updatedAt: string) {
+    this.defaults = new Map(defaults.map((team) => [team.splTeamId, team]));
+    this.overrides = overrides;
+    this.updatedAt = updatedAt;
   }
 
-  /**
-   * Difficulty of facing `opponentId` for a player whose team is home/away.
-   * Attacking players care how much the opponent concedes; defensive players
-   * care how much the opponent creates.
-   */
+  /** Difficulty of facing `opponentId` for a player whose team is home/away. */
   getDifficulty(opponentId: number, playerIsHome: boolean, group: PositionGroup): Difficulty | null {
-    const opponent = this.ratings.get(opponentId);
-    if (!opponent) return null;
+    // Ratings are stored from the rated (opponent) team's venue.
+    const venue = playerIsHome ? "away" : "home";
+    return this.rating(opponentId, group === "attacking" ? `defence.${venue}` : `attack.${venue}`);
+  }
 
-    const score =
-      group === "attacking"
-        ? 1 / (opponent.defence * (playerIsHome ? this.homeFactor : this.awayFactor))
-        : opponent.attack * (playerIsHome ? this.awayFactor : this.homeFactor);
+  rating(teamId: number, key: RatingKey): Difficulty | null {
+    const edited = this.overrides[teamId]?.[key];
+    return isDifficulty(edited) ? edited : this.defaultRating(teamId, key);
+  }
 
-    const index = BUCKET_UPPER_BOUNDS.findIndex((bound) => score < bound);
-    return (index === -1 ? 5 : index + 1) as Difficulty;
+  defaultRating(teamId: number, key: RatingKey): Difficulty | null {
+    const team = this.defaults.get(teamId);
+    if (!team) return null;
+    const [side, venue] = key.split(".") as ["attack" | "defence", "home" | "away"];
+    const value = team[side][venue];
+    return isDifficulty(value) ? value : null;
+  }
+
+  isEdited(teamId: number, key: RatingKey): boolean {
+    return isDifficulty(this.overrides[teamId]?.[key]);
+  }
+
+  /** Number of teams with at least one edited value. */
+  get editedTeamCount(): number {
+    return Object.values(this.overrides).filter((values) => Object.values(values).some(isDifficulty)).length;
   }
 }

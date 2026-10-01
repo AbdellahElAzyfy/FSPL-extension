@@ -3,6 +3,7 @@ import "../ui/fdrColors.css";
 import { dataStore } from "./dataStore";
 import { scanForPlayerRows } from "./playerRowInjector";
 import { ensureDifficultyTab } from "./difficultyTab";
+import { onRatingsChange } from "../fdr/ratingsStore";
 
 function scanPage(): void {
   scanForPlayerRows();
@@ -18,6 +19,9 @@ async function bootstrap(): Promise<void> {
   }
 
   scanPage();
+
+  // Rating edits (here, in another tab, or a reset) recolour every strip at once.
+  onRatingsChange(() => scanPage());
 
   // SPA re-renders player rows and the nav on every navigation/filter
   // change, so keep re-scanning on DOM mutations. Swapping a player often

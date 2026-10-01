@@ -1,0 +1,221 @@
+{
+  "updatedAt": "2026-10-01",
+  "teams": [
+    {
+      "splTeamId": 1,
+      "shortName": "AHL",
+      "attack": {
+        "home": 5,
+        "away": 5
+      },
+      "defence": {
+        "home": 4,
+        "away": 4
+      }
+    },
+    {
+      "splTeamId": 2,
+      "shortName": "FAT",
+      "attack": {
+        "home": 2,
+        "away": 2
+      },
+      "defence": {
+        "home": 2,
+        "away": 2
+      }
+    },
+    {
+      "splTeamId": 3,
+      "shortName": "FYH",
+      "attack": {
+        "home": 2,
+        "away": 1
+      },
+      "defence": {
+        "home": 2,
+        "away": 1
+      }
+    },
+    {
+      "splTeamId": 4,
+      "shortName": "HIL",
+      "attack": {
+        "home": 5,
+        "away": 5
+      },
+      "defence": {
+        "home": 4,
+        "away": 4
+      }
+    },
+    {
+      "splTeamId": 5,
+      "shortName": "ETT",
+      "attack": {
+        "home": 3,
+        "away": 2
+      },
+      "defence": {
+        "home": 4,
+        "away": 3
+      }
+    },
+    {
+      "splTeamId": 6,
+      "shortName": "ITT",
+      "attack": {
+        "home": 5,
+        "away": 4
+      },
+      "defence": {
+        "home": 4,
+        "away": 3
+      }
+    },
+    {
+      "splTeamId": 7,
+      "shortName": "KLJ",
+      "attack": {
+        "home": 1,
+        "away": 1
+      },
+      "defence": {
+        "home": 3,
+        "away": 3
+      }
+    },
+    {
+      "splTeamId": 8,
+      "shortName": "NAS",
+      "attack": {
+        "home": 5,
+        "away": 4
+      },
+      "defence": {
+        "home": 5,
+        "away": 5
+      }
+    },
+    {
+      "splTeamId": 9,
+      "shortName": "RIY",
+      "attack": {
+        "home": 1,
+        "away": 1
+      },
+      "defence": {
+        "home": 2,
+        "away": 2
+      }
+    },
+    {
+      "splTeamId": 10,
+      "shortName": "SHB",
+      "attack": {
+        "home": 3,
+        "away": 2
+      },
+      "defence": {
+        "home": 2,
+        "away": 2
+      }
+    },
+    {
+      "splTeamId": 11,
+      "shortName": "TWN",
+      "attack": {
+        "home": 3,
+        "away": 2
+      },
+      "defence": {
+        "home": 2,
+        "away": 2
+      }
+    },
+    {
+      "splTeamId": 12,
+      "shortName": "QAD",
+      "attack": {
+        "home": 5,
+        "away": 5
+      },
+      "defence": {
+        "home": 5,
+        "away": 5
+      }
+    },
+    {
+      "splTeamId": 13,
+      "shortName": "KLD",
+      "attack": {
+        "home": 4,
+        "away": 3
+      },
+      "defence": {
+        "home": 4,
+        "away": 3
+      }
+    },
+    {
+      "splTeamId": 14,
+      "shortName": "NEO",
+      "attack": {
+        "home": 3,
+        "away": 2
+      },
+      "defence": {
+        "home": 5,
+        "away": 4
+      }
+    },
+    {
+      "splTeamId": 15,
+      "shortName": "HAZ",
+      "attack": {
+        "home": 2,
+        "away": 1
+      },
+      "defence": {
+        "home": 2,
+        "away": 1
+      }
+    },
+    {
+      "splTeamId": 16,
+      "shortName": "ABH",
+      "attack": {
+        "home": 1,
+        "away": 1
+      },
+      "defence": {
+        "home": 3,
+        "away": 3
+      }
+    },
+    {
+      "splTeamId": 17,
+      "shortName": "FSL",
+      "attack": {
+        "home": 2,
+        "away": 1
+      },
+      "defence": {
+        "home": 2,
+        "away": 2
+      }
+    },
+    {
+      "splTeamId": 18,
+      "shortName": "DIR",
+      "attack": {
+        "home": 3,
+        "away": 3
+      },
+      "defence": {
+        "home": 5,
+        "away": 4
+      }
+    }
+  ]
+}
