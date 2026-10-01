@@ -36,7 +36,13 @@ export function buildTeamFixtureMap(
   teamsById: Map<number, Team>,
   count = 5,
 ): TeamFixtureMap {
-  const sorted = [...fixtures].sort((a, b) => a.event - b.event);
+  // Postponed fixtures without a new date have event = null: leave them out
+  // rather than guess where they go. Within a round (double gameweeks), order
+  // by kickoff.
+  const kickoff = (f: Fixture) => (f.kickoff_time ? Date.parse(f.kickoff_time) : Infinity);
+  const sorted = fixtures
+    .filter((f) => f.event != null)
+    .sort((a, b) => a.event - b.event || kickoff(a) - kickoff(b));
   const map: TeamFixtureMap = new Map();
 
   for (const fixture of sorted) {

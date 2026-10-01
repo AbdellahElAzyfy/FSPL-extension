@@ -32,7 +32,13 @@ interface Cell {
  */
 export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
   const teamsById = new Map(input.teams.map((t) => [t.id, t]));
-  const rounds = input.events.filter((e) => !e.finished).sort((a, b) => a.id - b.id);
+  // Rounds still open for transfers. Once a round's deadline passes it's being
+  // played (teams that already played would show as blank), and transfers
+  // apply to the next round anyway — so the grid starts there.
+  const now = Date.now();
+  const rounds = input.events
+    .filter((e) => !e.finished && Date.parse(e.deadline_time) > now)
+    .sort((a, b) => a.id - b.id);
   const remainingRoundIds = new Set(rounds.map((r) => r.id));
 
   // teamId -> roundId -> fixtures that round (0 = blank, 2+ = double)
@@ -116,7 +122,9 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
   const editToggle = root.querySelector<HTMLButtonElement>(".spl-fh-season__edit-toggle")!;
 
   const renderSubtitle = (model: DifficultyModel) => {
-    const updated = new Date(model.updatedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    // "YYYY-MM-DD" alone parses as UTC midnight, which shows the previous day
+    // west of UTC — read it as a local date instead.
+    const updated = new Date(`${model.updatedAt}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
     const edited = model.editedTeamCount;
     subtitle.textContent =
       `Ratings based on team stats · updated ${updated}` +

@@ -20,16 +20,19 @@ let openedAtPath = "";
 export function ensureDifficultyTab(): void {
   if (!dataStore.seasonGridInput) return;
 
-  const fixturesLink = document.querySelector<HTMLAnchorElement>('.ism-nav a.ism-nav__tab[href$="/fixtures"]');
-  const list = fixturesLink?.closest("ul");
-  if (!fixturesLink || !list) return;
+  const list = document.querySelector(".ism-nav a.ism-nav__tab")?.closest("ul");
+  if (!list) return;
 
   let tab = list.querySelector<HTMLAnchorElement>(`[${TAB_MARKER}]`);
   if (!tab) {
     tab = createTab();
     const item = document.createElement("li");
     item.append(tab);
-    fixturesLink.closest("li")!.after(item);
+    // Right after Fixtures when logged in; logged-out visitors have no Fixtures
+    // tab (Home / Prizes / Help / Statistics), so go at the end there.
+    const fixturesItem = list.querySelector('a.ism-nav__tab[href$="/fixtures"]')?.closest("li");
+    if (fixturesItem) fixturesItem.after(item);
+    else list.append(item);
     // Capture phase so we restore the site page before its router handles the click.
     list.addEventListener("click", (event) => {
       const link = (event.target as Element).closest("a");

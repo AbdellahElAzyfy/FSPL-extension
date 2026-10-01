@@ -47,10 +47,7 @@ export function loadRatings(): Promise<void> {
     model = buildModel();
 
     chrome.storage.onChanged.addListener((changes, area) => {
-      if (area !== "sync" || !(STORAGE_KEY in changes)) return;
-      const next = sanitizeOverrides(changes[STORAGE_KEY].newValue);
-      if (JSON.stringify(next) === JSON.stringify(overrides)) return; // our own write, already applied
-      applyOverrides(next);
+      if (area === "sync" && STORAGE_KEY in changes) onStoredOverridesChanged(changes[STORAGE_KEY].newValue);
     });
   })();
   return loadPromise;
@@ -113,9 +110,57 @@ function applyOverrides(next: RatingOverrides): void {
   listeners.forEach((listener) => listener());
 }
 
-async function saveOverrides(next: RatingOverrides): Promise<void> {
+// chrome.storage.sync allows ~120 writes a minute, and every click in the
+// editor is an edit — so apply edits instantly but batch the write.
+const SAVE_DELAY_MS = 600;
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingSaves: (() => void)[] = [];
+let lastWrittenJson = "";
+
+function saveOverrides(next: RatingOverrides): Promise<void> {
   applyOverrides(next); // update this tab immediately; storage syncs the rest
-  await chrome.storage.sync.set({ [STORAGE_KEY]: next });
+  if (saveTimer) clearTimeout(saveTimer);
+  return new Promise((resolve) => {
+    pendingSaves.push(resolve);
+    saveTimer = setTimeout(writeNow, SAVE_DELAY_MS);
+  });
+}
+
+async function writeNow(): Promise<void> {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = null;
+  const done = pendingSaves;
+  pendingSaves = [];
+  lastWrittenJson = JSON.stringify(overrides);
+  try {
+    await chrome.storage.sync.set({ [STORAGE_KEY]: overrides });
+  } catch (err) {
+    // e.g. the extension was updated while this tab stayed open (a page reload
+    // reconnects it) or the disk is full. The edit still applies on this page.
+    console.warn("[SPL Fantasy Helper] couldn't save rating edits", err);
+  }
+  done.forEach((resolveSave) => resolveSave());
+}
+
+// Don't lose an edit made just before the tab is closed, reloaded or hidden.
+const flushPendingSave = () => {
+  if (saveTimer) void writeNow();
+};
+addEventListener("pagehide", flushPendingSave);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") flushPendingSave();
+});
+
+/** Edits from another tab. Ignores echoes of our own writes and anything that
+ * arrives while we still have unsaved edits (ours are written last and win). */
+function onStoredOverridesChanged(raw: unknown): void {
+  const json = JSON.stringify(sanitizeOverrides(raw));
+  if (json === lastWrittenJson) {
+    lastWrittenJson = ""; // our own write echoing back — skip it once
+    return;
+  }
+  if (saveTimer || json === JSON.stringify(overrides)) return;
+  applyOverrides(JSON.parse(json));
 }
 
 async function fetchRemote(): Promise<TeamRatingsFile | null> {
