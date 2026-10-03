@@ -1,5 +1,6 @@
 import type { DifficultyModel, PositionGroup } from "../fdr/difficulty";
-import type { ResolvedFixture } from "../types/fixtures";
+import type { TeamFixture } from "../types/fixtures";
+import { t } from "./i18n";
 
 /**
  * Renders a compact strip of the next N fixtures for a player's team,
@@ -10,28 +11,37 @@ import type { ResolvedFixture } from "../types/fixtures";
  * group. If the position can't be determined, chips stay neutral grey.
  */
 export function renderFixtureStrip(
-  fixtures: ResolvedFixture[],
+  fixtures: TeamFixture[],
   positionGroup: PositionGroup | null,
   difficulty: DifficultyModel | null,
 ): HTMLElement {
   const container = document.createElement("div");
   container.className = "spl-fh-fixture-strip";
-
-  for (const { opponent, isHome } of fixtures) {
-    const cell = document.createElement("span");
-    cell.className = "spl-fh-fixture-cell";
-    cell.textContent = isHome ? opponent.short_name.toUpperCase() : opponent.short_name.toLowerCase();
-    cell.title = `${opponent.name.trim()} (${isHome ? "Home" : "Away"})`;
-
-    const rating = positionGroup && difficulty?.getDifficulty(opponent.id, isHome, positionGroup);
-    if (rating) {
-      cell.classList.add("spl-fh-fdr");
-      cell.dataset.fdr = String(rating);
-      cell.title += ` — difficulty ${rating}/5`;
-    }
-
-    container.appendChild(cell);
+  for (const fixture of fixtures) {
+    container.appendChild(fixtureChip(fixture, positionGroup, difficulty, "spl-fh-fixture-cell"));
   }
-
   return container;
+}
+
+/** One fixture as a chip: opponent code (uppercase = home), difficulty colour, details on hover. */
+export function fixtureChip(
+  { opponent, isHome }: TeamFixture,
+  positionGroup: PositionGroup | null,
+  difficulty: DifficultyModel | null,
+  className: string,
+): HTMLSpanElement {
+  const chip = document.createElement("span");
+  chip.className = className;
+  chip.textContent = isHome ? opponent.short_name.toUpperCase() : opponent.short_name.toLowerCase();
+  chip.title = isHome
+    ? t(`${opponent.name.trim()} (Home)`, `ضد ${opponent.name.trim()} (على الأرض)`)
+    : t(`${opponent.name.trim()} (Away)`, `ضد ${opponent.name.trim()} (خارج الأرض)`);
+
+  const rating = positionGroup && difficulty?.getDifficulty(opponent.id, isHome, positionGroup);
+  if (rating) {
+    chip.classList.add("spl-fh-fdr");
+    chip.dataset.fdr = String(rating);
+    chip.title += t(` — difficulty ${rating}/5`, ` — الصعوبة ${rating}/5`);
+  }
+  return chip;
 }

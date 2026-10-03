@@ -33,16 +33,22 @@ export interface GameEvent {
   deadline_time: string;
 }
 
+/** A position. squad_min_play / squad_max_play bound how many may start. */
+export interface ElementType {
+  id: number;
+  squad_min_play: number;
+  squad_max_play: number;
+}
+
 export interface Bootstrap {
   teams: Team[];
   elements: Player[];
   events: GameEvent[];
+  element_types: ElementType[];
 }
 
-export type TeamFixtureMap = Map<number, ResolvedFixture[]>;
-
-export interface ResolvedFixture {
-  fixture: Fixture;
+/** One side of a fixture, seen from a team: who it plays and where. */
+export interface TeamFixture {
   opponent: Team;
   isHome: boolean;
 }

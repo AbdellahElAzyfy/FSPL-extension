@@ -9,6 +9,8 @@ import {
   resetTeam,
   setRatings,
 } from "../fdr/ratingsStore";
+import { Schedule } from "../fdr/schedule";
+import { dateLocale, t } from "./i18n";
 import type { Fixture, GameEvent, Team } from "../types/fixtures";
 import type { RatingKey, RatingSide } from "../types/teamRatings";
 
@@ -16,11 +18,6 @@ export interface SeasonGridInput {
   teams: Team[];
   events: GameEvent[];
   fixtures: Fixture[]; // any superset of the remaining fixtures; played ones are skipped
-}
-
-interface Cell {
-  opponent: Team;
-  isHome: boolean;
 }
 
 /**
@@ -31,31 +28,8 @@ interface Cell {
  * Fantasy site. Re-renders whenever the ratings change.
  */
 export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
-  const teamsById = new Map(input.teams.map((t) => [t.id, t]));
-  // Rounds still open for transfers. Once a round's deadline passes it's being
-  // played (teams that already played would show as blank), and transfers
-  // apply to the next round anyway — so the grid starts there.
-  const now = Date.now();
-  const rounds = input.events
-    .filter((e) => !e.finished && Date.parse(e.deadline_time) > now)
-    .sort((a, b) => a.id - b.id);
-  const remainingRoundIds = new Set(rounds.map((r) => r.id));
-
-  // teamId -> roundId -> fixtures that round (0 = blank, 2+ = double)
-  const schedule = new Map<number, Map<number, Cell[]>>(input.teams.map((t) => [t.id, new Map()]));
-  const add = (teamId: number, round: number, cell: Cell) => {
-    const byRound = schedule.get(teamId);
-    if (!byRound) return;
-    byRound.set(round, [...(byRound.get(round) ?? []), cell]);
-  };
-  for (const fixture of input.fixtures) {
-    if (fixture.event == null || fixture.finished || !remainingRoundIds.has(fixture.event)) continue;
-    const home = teamsById.get(fixture.team_h);
-    const away = teamsById.get(fixture.team_a);
-    if (!home || !away) continue;
-    add(home.id, fixture.event, { opponent: away, isHome: true });
-    add(away.id, fixture.event, { opponent: home, isHome: false });
-  }
+  const schedule = new Schedule(input.teams, input.events, input.fixtures);
+  const rounds = schedule.rounds;
 
   const state = { group: "attacking" as PositionGroup, horizon: "5", editing: false };
   // Editor: whether a team's home & away values move together, per "teamId|side".
@@ -67,46 +41,53 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
   root.innerHTML = `
     <header class="spl-fh-season__header">
       <div>
-        <h2>Fixture difficulty</h2>
+        <h2>${t("Fixture difficulty", "صعوبة المباريات")}</h2>
         <p class="spl-fh-season__subtitle"></p>
       </div>
       <div class="spl-fh-season__controls">
-        <div class="spl-fh-season__segmented" role="radiogroup" aria-label="Rate fixtures for">
-          <button type="button" role="radio" data-group="attacking" aria-checked="true">Attackers <span>MID / FWD</span></button>
-          <button type="button" role="radio" data-group="defensive" aria-checked="false">Defenders <span>GK / DEF</span></button>
+        <div class="spl-fh-season__segmented" role="radiogroup" aria-label="${t("Rate fixtures for", "تقييم المباريات لـ")}">
+          <button type="button" role="radio" data-group="attacking" aria-checked="true">${t("Attackers", "الهجوم")} <span>${t("MID / FWD", "وسط / مهاجم")}</span></button>
+          <button type="button" role="radio" data-group="defensive" aria-checked="false">${t("Defenders", "الدفاع")} <span>${t("GK / DEF", "حارس / مدافع")}</span></button>
         </div>
         <label class="spl-fh-season__horizon">
-          Show
+          ${t("Show", "عرض")}
           <select>
-            <option value="5">Next 5 rounds</option>
-            <option value="10">Next 10 rounds</option>
-            <option value="all">Rest of season</option>
+            <option value="5">${t("Next 5 rounds", "الجولات الخمس القادمة")}</option>
+            <option value="10">${t("Next 10 rounds", "الجولات العشر القادمة")}</option>
+            <option value="all">${t("Rest of season", "بقية الموسم")}</option>
           </select>
         </label>
-        <button type="button" class="spl-fh-season__edit-toggle" aria-expanded="false">Edit ratings</button>
+        <button type="button" class="spl-fh-season__edit-toggle" aria-expanded="false">${t("Edit ratings", "تعديل التقييمات")}</button>
       </div>
     </header>
-    <div class="spl-fh-season__legend" aria-label="Difficulty scale">
-      <span>Easy</span>
+    <div class="spl-fh-season__legend" aria-label="${t("Difficulty scale", "مقياس الصعوبة")}">
+      <span>${t("Easy", "سهلة")}</span>
       <i class="spl-fh-fdr" data-fdr="1">1</i>
       <i class="spl-fh-fdr" data-fdr="2">2</i>
       <i class="spl-fh-fdr" data-fdr="3">3</i>
       <i class="spl-fh-fdr" data-fdr="4">4</i>
       <i class="spl-fh-fdr" data-fdr="5">5</i>
-      <span>Hard</span>
-      <span class="spl-fh-season__note">UPPERCASE = home, lowercase = away · sorted easiest first</span>
+      <span>${t("Hard", "صعبة")}</span>
+      <span class="spl-fh-season__note">${t(
+        "UPPERCASE = home, lowercase = away · sorted easiest first",
+        "الأحرف الكبيرة = على الأرض، الصغيرة = خارج الأرض · الأسهل أولًا",
+      )}</span>
     </div>
     <div class="spl-fh-season__editor" hidden>
       <div class="spl-fh-season__editor-head">
-        <p>
-          How strong is each team? <strong>5 = strongest</strong> (hardest to face).
+        <p>${t(
+          `How strong is each team? <strong>5 = strongest</strong> (hardest to face).
           <strong>Attack</strong> sets the difficulty for goalkeepers &amp; defenders facing them,
           <strong>Defence</strong> for midfielders &amp; forwards.
-          <strong>Home / Away</strong> = where that team plays. Your changes are saved in your browser.
-        </p>
+          <strong>Home / Away</strong> = where that team plays. Your changes are saved in your browser.`,
+          `ما مدى قوة كل فريق؟ <strong>5 = الأقوى</strong> (الأصعب في مواجهته).
+          <strong>الهجوم</strong> يحدد صعوبة المباراة للحراس والمدافعين الذين يواجهونه،
+          و<strong>الدفاع</strong> للاعبي الوسط والمهاجمين.
+          <strong>على أرضه / خارج أرضه</strong> = مكان لعب ذلك الفريق. تُحفظ تعديلاتك في متصفحك.`,
+        )}</p>
         <div class="spl-fh-season__editor-actions">
-          <button type="button" data-action="copy">Copy as JSON</button>
-          <button type="button" data-action="reset-all">Reset all to default</button>
+          <button type="button" data-action="copy">${t("Copy as JSON", "نسخ بصيغة JSON")}</button>
+          <button type="button" data-action="reset-all">${t("Reset all to default", "إعادة الكل إلى الافتراضي")}</button>
         </div>
       </div>
       <textarea class="spl-fh-season__export" readonly hidden></textarea>
@@ -124,21 +105,20 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
   const renderSubtitle = (model: DifficultyModel) => {
     // "YYYY-MM-DD" alone parses as UTC midnight, which shows the previous day
     // west of UTC — read it as a local date instead.
-    const updated = new Date(`${model.updatedAt}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    const updated = new Date(`${model.updatedAt}T00:00:00`).toLocaleDateString(dateLocale(), { day: "numeric", month: "short" });
     const edited = model.editedTeamCount;
     subtitle.textContent =
-      `Ratings based on team stats · updated ${updated}` +
-      (edited ? ` · ${edited} team${edited === 1 ? "" : "s"} edited by you` : "");
+      t(`Ratings based on team stats · updated ${updated}`, `التقييمات مبنية على إحصائيات الفرق · آخر تحديث ${updated}`) +
+      (edited ? t(` · ${edited} team${edited === 1 ? "" : "s"} edited by you`, ` · فرق عدّلتها: ${edited}`) : "");
   };
 
   const renderGrid = (model: DifficultyModel) => {
     const shown = state.horizon === "all" ? rounds : rounds.slice(0, Number(state.horizon));
 
     const rows = input.teams.map((team) => {
-      const byRound = schedule.get(team.id)!;
       const ratings: Difficulty[] = [];
       const cells = shown.map((round) =>
-        (byRound.get(round.id) ?? []).map((cell) => {
+        schedule.fixtures(team.id, round.id).map((cell) => {
           const rating = model.getDifficulty(cell.opponent.id, cell.isHome, state.group);
           if (rating) ratings.push(rating);
           return { ...cell, rating };
@@ -151,11 +131,11 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
 
     grid.replaceChildren();
     const head = grid.createTHead().insertRow();
-    head.append(th("Team", "spl-fh-season__team"), th("Avg", "spl-fh-season__avg"));
+    head.append(th(t("Team", "الفريق"), "spl-fh-season__team"), th(t("Avg", "المعدل"), "spl-fh-season__avg"));
     for (const round of shown) {
-      const cell = th(`R${round.id}`);
+      const cell = th(`R${round.id}`); // "R8" in Arabic too (user's choice)
       const date = document.createElement("small");
-      date.textContent = new Date(round.deadline_time).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+      date.textContent = new Date(round.deadline_time).toLocaleDateString(dateLocale(), { day: "numeric", month: "short" });
       cell.append(date);
       head.append(cell);
     }
@@ -177,7 +157,7 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
         if (fixtures.length === 0) {
           td.classList.add("spl-fh-season__blank");
           td.textContent = "—";
-          td.title = "No fixture this round";
+          td.title = t("No fixture this round", "لا مباراة في هذه الجولة");
           continue;
         }
         for (const { opponent, isHome, rating } of fixtures) {
@@ -185,7 +165,11 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
           chip.className = "spl-fh-season__chip spl-fh-fdr";
           if (rating) chip.dataset.fdr = String(rating);
           chip.textContent = isHome ? opponent.short_name.toUpperCase() : opponent.short_name.toLowerCase();
-          chip.title = `${opponent.name.trim()} (${isHome ? "Home" : "Away"})${rating ? ` — difficulty ${rating}/5` : ""}`;
+          chip.title =
+            (isHome
+              ? t(`${opponent.name.trim()} (Home)`, `ضد ${opponent.name.trim()} (على الأرض)`)
+              : t(`${opponent.name.trim()} (Away)`, `ضد ${opponent.name.trim()} (خارج الأرض)`)) +
+            (rating ? t(` — difficulty ${rating}/5`, ` — الصعوبة ${rating}/5`) : "");
           td.append(chip);
         }
       }
@@ -196,8 +180,11 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
     editorTable.replaceChildren();
     const head = editorTable.createTHead();
     const top = head.insertRow();
-    top.append(th("Team", "spl-fh-season__team"));
-    for (const label of ["Attack — vs GK / DEF", "Defence — vs MID / FWD"]) {
+    top.append(th(t("Team", "الفريق"), "spl-fh-season__team"));
+    for (const label of [
+      t("Attack — vs GK / DEF", "الهجوم — ضد الحارس / المدافع"),
+      t("Defence — vs MID / FWD", "الدفاع — ضد الوسط / المهاجم"),
+    ]) {
       const cell = th(label);
       cell.colSpan = 3;
       top.append(cell);
@@ -205,7 +192,7 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
     top.append(th(""));
     const sub = head.insertRow();
     sub.append(th("", "spl-fh-season__team"));
-    for (let i = 0; i < 2; i++) sub.append(th("Home"), th("Away"), th(""));
+    for (let i = 0; i < 2; i++) sub.append(th(t("Home", "على أرضه")), th(t("Away", "خارج أرضه")), th(""));
     sub.append(th(""));
 
     const body = editorTable.createTBody();
@@ -230,8 +217,13 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
         link.className = "spl-fh-season__link";
         link.dataset.focusId = `link|${linkId}`;
         link.setAttribute("aria-pressed", String(linked.get(linkId)));
-        link.setAttribute("aria-label", `${team.short_name} ${side}: same home and away`);
-        link.title = linked.get(linkId) ? "Home & away linked — click to set them separately" : "Click to link home & away";
+        link.setAttribute(
+          "aria-label",
+          t(`${team.short_name} ${side}: same home and away`, `${team.short_name} ${sideName(side)}: نفس القيمة على أرضه وخارجها`),
+        );
+        link.title = linked.get(linkId)
+          ? t("Home & away linked — click to set them separately", "على أرضه وخارجها مرتبطان — انقر لتحديد كل منهما على حدة")
+          : t("Click to link home & away", "انقر لربط القيمتين على أرضه وخارجها");
         link.textContent = "🔗"; // faded via CSS when unlinked
         link.addEventListener("click", () => {
           const nowLinked = !linked.get(linkId);
@@ -253,8 +245,8 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
         reset.type = "button";
         reset.className = "spl-fh-season__row-reset";
         reset.dataset.focusId = `reset|${team.id}`;
-        reset.textContent = "Reset";
-        reset.title = `Reset ${team.name.trim()} to the default ratings`;
+        reset.textContent = t("Reset", "إعادة ضبط");
+        reset.title = t(`Reset ${team.name.trim()} to the default ratings`, `إعادة ${team.name.trim()} إلى التقييمات الافتراضية`);
         reset.addEventListener("click", () => {
           linked.delete(`${team.id}|attack`);
           linked.delete(`${team.id}|defence`);
@@ -271,10 +263,16 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
     const group = document.createElement("div");
     group.className = "spl-fh-season__picker";
     group.setAttribute("role", "radiogroup");
-    group.setAttribute("aria-label", `${team.name.trim()} ${side}, ${venue}`);
+    group.setAttribute(
+      "aria-label",
+      t(`${team.name.trim()} ${side}, ${venue}`, `${team.name.trim()} ${sideName(side)}، ${venue === "home" ? "على أرضه" : "خارج أرضه"}`),
+    );
     if (model.isEdited(team.id, key)) {
       group.dataset.edited = "";
-      group.title = `Edited by you — default is ${model.defaultRating(team.id, key)}`;
+      group.title = t(
+        `Edited by you — default is ${model.defaultRating(team.id, key)}`,
+        `عدّلتها أنت — القيمة الافتراضية ${model.defaultRating(team.id, key)}`,
+      );
     }
     for (let value = 1 as Difficulty; value <= 5; value = (value + 1) as Difficulty) {
       const option = document.createElement("button");
@@ -321,12 +319,12 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
   editToggle.addEventListener("click", () => {
     state.editing = !state.editing;
     editToggle.setAttribute("aria-expanded", String(state.editing));
-    editToggle.textContent = state.editing ? "Done editing" : "Edit ratings";
+    editToggle.textContent = state.editing ? t("Done editing", "إنهاء التعديل") : t("Edit ratings", "تعديل التقييمات");
     editor.hidden = !state.editing;
     render();
   });
   root.querySelector('[data-action="reset-all"]')!.addEventListener("click", () => {
-    if (!confirm("Reset all team ratings to the defaults? Your edits will be removed.")) return;
+    if (!confirm(t("Reset all team ratings to the defaults? Your edits will be removed.", "إعادة جميع تقييمات الفرق إلى الافتراضي؟ ستُحذف تعديلاتك."))) return;
     linked.clear();
     void resetAll();
   });
@@ -339,8 +337,8 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
         navigator.clipboard.writeText(json),
         new Promise((_, reject) => setTimeout(() => reject(new Error("clipboard timeout")), 1500)),
       ]);
-      copyButton.textContent = "Copied!";
-      setTimeout(() => (copyButton.textContent = "Copy as JSON"), 2000);
+      copyButton.textContent = t("Copied!", "تم النسخ!");
+      setTimeout(() => (copyButton.textContent = t("Copy as JSON", "نسخ بصيغة JSON")), 2000);
     } catch {
       // Clipboard can be blocked on some pages; show it for manual copying instead.
       exportBox.value = json;
@@ -360,6 +358,10 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
 
   render();
   return root;
+}
+
+function sideName(side: RatingSide): string {
+  return side === "attack" ? "الهجوم" : "الدفاع";
 }
 
 function th(text: string, className?: string): HTMLTableCellElement {

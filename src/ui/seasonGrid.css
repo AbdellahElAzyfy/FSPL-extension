@@ -10,14 +10,14 @@
   --fh-muted: #9aa5b8;
   --fh-accent: #b7f400; /* the site's lime */
 
-  /* Round columns always run left -> right, even on the RTL Arabic site. */
-  direction: ltr;
+  /* Text follows the page (right-to-left on the Arabic site); the tables
+     don't, see .spl-fh-season__table-wrap. */
   box-sizing: border-box;
   width: 100%;
   color: var(--fh-text);
   font-size: 14px;
   line-height: 1.4;
-  text-align: left;
+  text-align: start;
 }
 .spl-fh-season *, .spl-fh-season *::before, .spl-fh-season *::after { box-sizing: inherit; }
 
@@ -86,9 +86,12 @@
   font-style: normal;
   font-weight: 700;
 }
-.spl-fh-season__note { margin-left: 12px; }
+.spl-fh-season__note { margin-inline-start: 12px; }
 
 .spl-fh-season__table-wrap {
+  /* Round columns always run left -> right, like the fixture strips, even on
+     the RTL Arabic site. */
+  direction: ltr;
   overflow-x: auto;
   border: 1px solid var(--fh-border);
   border-radius: 8px;
@@ -111,14 +114,14 @@
 
 .spl-fh-season .spl-fh-season__team {
   position: sticky;
-  left: 0;
+  inset-inline-start: 0;
   z-index: 1;
   width: 1%; /* shrink to content; spare width goes to the round columns */
   min-width: 150px;
   padding: 0 12px;
   background: var(--fh-surface);
   color: var(--fh-text);
-  text-align: left;
+  text-align: start;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -190,6 +193,8 @@
   background: var(--fh-surface);
 }
 .spl-fh-season__editor[hidden] { display: none; }
+/* Only the round grid has a fixed left -> right order; the editor reads with the page. */
+.spl-fh-season__editor .spl-fh-season__table-wrap { direction: inherit; }
 .spl-fh-season__editor-head {
   display: flex;
   flex-wrap: wrap;

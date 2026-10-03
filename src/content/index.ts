@@ -3,10 +3,15 @@ import "../ui/fdrColors.css";
 import { dataStore } from "./dataStore";
 import { scanForPlayerRows } from "./playerRowInjector";
 import { ensureDifficultyTab } from "./difficultyTab";
+import { ensurePickTeamRounds } from "./pickTeamRounds";
+import { ensureTransferPlanner } from "./transferPlanner";
 import { onRatingsChange } from "../fdr/ratingsStore";
 
 function scanPage(): void {
+  // Round browser first: it decides which round the strips start at.
+  ensurePickTeamRounds(scanPage);
   scanForPlayerRows();
+  ensureTransferPlanner();
   ensureDifficultyTab();
 }
 

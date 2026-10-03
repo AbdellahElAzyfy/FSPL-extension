@@ -1,0 +1,34 @@
+/* Gameweek stepper, shared by the Pick Team bar and the team planner. */
+.spl-fh-round-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  direction: ltr;
+  color: #f2f4f8;
+  font-size: 14px;
+  line-height: 1.3;
+}
+.spl-fh-round-nav__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 128px;
+  text-align: center;
+}
+.spl-fh-round-nav__label strong { font-size: 15px; font-weight: 700; }
+.spl-fh-round-nav__label small { font-size: 12px; color: #9aa5b8; }
+.spl-fh-round-nav__step {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #2e3a4f;
+  border-radius: 8px;
+  background: #252f41;
+  color: #f2f4f8;
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.spl-fh-round-nav__step:hover:not(:disabled) { border-color: #b7f400; }
+.spl-fh-round-nav__step:focus-visible { outline: 2px solid #b7f400; outline-offset: 2px; }
+.spl-fh-round-nav__step:disabled { opacity: 0.35; cursor: default; }

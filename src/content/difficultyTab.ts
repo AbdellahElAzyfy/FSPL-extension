@@ -1,4 +1,5 @@
 import { dataStore } from "./dataStore";
+import { t } from "../ui/i18n";
 import { createSeasonGrid } from "../ui/seasonGrid";
 
 const TAB_MARKER = "data-spl-fh-difficulty-tab";
@@ -48,7 +49,7 @@ function createTab(): HTMLAnchorElement {
   tab.className = "ism-nav__tab";
   tab.href = "#";
   tab.setAttribute(TAB_MARKER, "");
-  tab.textContent = document.documentElement.lang === "ar" ? "صعوبة المباريات" : "Difficulty";
+  tab.textContent = t("Difficulty", "صعوبة المباريات");
   tab.addEventListener("click", (event) => {
     event.preventDefault();
     openView();
