@@ -16,6 +16,10 @@ const zipPath = join(releaseDir, `spl-fantasy-helper-${version}.zip`);
 mkdirSync(releaseDir, { recursive: true });
 if (existsSync(zipPath)) rmSync(zipPath);
 
+// On Windows, name System32's bsdtar: from Git Bash, plain "tar" is GNU tar,
+// which can't write zips and reads "C:\..." as a remote host.
+const tar = process.platform === "win32" ? join(process.env.SystemRoot ?? "C:\\Windows", "System32", "tar.exe") : "tar";
+
 // List dist's entries explicitly (rather than ".") so paths have no "./" prefix.
-execFileSync("tar", ["-a", "-c", "-f", zipPath, "-C", dist, ...readdirSync(dist)], { stdio: "inherit" });
+execFileSync(tar, ["-a", "-c", "-f", zipPath, "-C", dist, ...readdirSync(dist)], { stdio: "inherit" });
 console.log(`Wrote ${zipPath}`);
