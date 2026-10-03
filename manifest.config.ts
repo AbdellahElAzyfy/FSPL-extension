@@ -6,7 +6,7 @@ export default defineManifest({
   name: "SPL Fantasy Helper",
   // Store limit: 132 characters. "Unofficial" up front — we are not affiliated with the league.
   description:
-    "Unofficial helper for SPL Fantasy: colour-coded next-5 fixtures on every player and a full-season fixture difficulty table.",
+    "Unofficial SPL Fantasy helper: colour-coded fixtures on every player, a team planner for future gameweeks and a difficulty table.",
   version: pkg.version,
   homepage_url: "https://github.com/AbdellahElAzyfy/FSPL-extension",
   icons: {
@@ -32,7 +32,8 @@ export default defineManifest({
     "https://fantasy.spl.com.sa/*",
     "https://*.fantasy.spl.com.sa/*",
   ],
-  // Saves the user's own edits to the team difficulty ratings (chrome.storage.sync).
+  // Saves the user's own edits to the team difficulty ratings (chrome.storage.sync)
+  // and their saved team plans (chrome.storage.local).
   permissions: ["storage"],
   content_scripts: [
     {
