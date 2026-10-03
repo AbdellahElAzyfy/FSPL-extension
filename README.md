@@ -36,3 +36,9 @@ same or newer than the bundled one). Users' own edits stay on top.
 
 Easiest way to edit: open the Difficulty tab → Edit ratings, set the values,
 click **Copy as JSON**, paste over `data/team-ratings.json`, commit and push.
+
+## License
+
+Copyright © 2026 Abdellah El Azyfy. All rights reserved. The source is public
+for transparency only. Copying, modifying or republishing it is not permitted
+without written permission. See [LICENSE](LICENSE).
