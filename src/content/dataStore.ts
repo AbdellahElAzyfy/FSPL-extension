@@ -75,24 +75,19 @@ class DataStore {
     return this.elementTypes.find((t) => t.id === typeId);
   }
 
-  /**
-   * Rows only show a player's name and shirt, so the player comes from matching
-   * name + team against bootstrap-static. A handful of same-name teammates
-   * exist; the GK shirt tells a keeper apart from an outfield namesake.
-   * Returns null if the row can't be resolved to exactly one player.
-   */
-  findPlayer(teamId: number, webName: string, wearsGkShirt: boolean): Player | null {
-    const candidates = this.candidates(teamId, webName, wearsGkShirt);
-    return candidates.length === 1 ? candidates[0] : null;
-  }
-
-  /** Like findPlayer, but only the position group must be unambiguous. */
+  /** A row's position group, if all the players it could be share one. */
   positionGroupFor(teamId: number, webName: string, wearsGkShirt: boolean): PositionGroup | null {
     const groups = new Set(this.candidates(teamId, webName, wearsGkShirt).map((p) => positionGroupOf(p.element_type)));
     return groups.size === 1 ? [...groups][0] : null;
   }
 
-  private candidates(teamId: number, webName: string, wearsGkShirt: boolean): Player[] {
+  /**
+   * Rows only show a player's name and shirt, so the player comes from matching
+   * name + team against bootstrap-static: every player the row could be. A
+   * handful of same-name teammates exist; the GK shirt tells a keeper apart
+   * from an outfield namesake.
+   */
+  candidates(teamId: number, webName: string, wearsGkShirt: boolean): Player[] {
     const players = this.playersByTeamAndName.get(`${teamId}|${webName}`) ?? [];
     return players.filter((p) => (p.element_type === GOALKEEPER_TYPE) === wearsGkShirt);
   }

@@ -132,9 +132,20 @@ async function refreshPlans(): Promise<void> {
 /** Applies the squad shown on the pitch above; true if it changed. */
 function followSquad(cards: ReturnType<typeof readPitchCards>): boolean {
   if (!state || cards.length === 0) return false; // e.g. list view: keep what we have
-  const ids = cards
-    .map((c) => dataStore.findPlayer(c.teamId, c.name, c.wearsGkShirt)?.id)
-    .filter((id): id is number => id !== undefined);
+  // A card only shows name + team, and a few teammates share a name (two
+  // "A. Al Khaibari" defenders at one club, 2026-10-03): then it's the one
+  // already in the lineup, so they aren't shown as sold. A namesake just
+  // bought can't be told apart, so take either rather than show a gap.
+  const inLineup = new Set(state.live.slots);
+  const used = new Set<number>();
+  const ids: number[] = [];
+  for (const c of cards) {
+    const candidates = dataStore.candidates(c.teamId, c.name, c.wearsGkShirt).filter((p) => !used.has(p.id));
+    const player = candidates.find((p) => inLineup.has(p.id)) ?? candidates[0];
+    if (!player) continue;
+    used.add(player.id);
+    ids.push(player.id);
+  }
   const key = [...ids].sort((a, b) => a - b).join(",");
   if (key === state.squadKey) return false;
 
