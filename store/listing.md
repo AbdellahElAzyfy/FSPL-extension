@@ -12,7 +12,7 @@ Copy-paste text for the Developer Dashboard. Upload file:
 **Summary** (from the manifest, 129/132 chars):
 Unofficial SPL Fantasy helper: colour-coded fixtures on every player, a team planner for future gameweeks and a difficulty table.
 
-**Category:** Sports
+**Category:** Lifestyle → Entertainment (the store has no Sports category)
 
 **Language:** English
 
