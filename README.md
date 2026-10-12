@@ -2,7 +2,8 @@
 
 Unofficial Chrome extension for [SPL Fantasy](https://fantasy.spl.com.sa/) (Arabic and English sites).
 
-- **Next 5 fixtures on every player** — on Pick Team and Transfers, each player row shows their team's next five opponents (UPPERCASE = home, lowercase = away).
+- **Next 5 fixtures on every player** — on Pick Team and Transfers, each player row shows their team's next five gameweeks (UPPERCASE = home, lowercase = away). A double gameweek shows both opponents stacked in that week's slot; a blank one shows "–".
+- **Price-change arrow** — a badge on each player's shirt shows his last price change: green ▲ rise, red ▼ fall, grey = unchanged this season.
 - **Gameweek browser** — on Pick Team, step through the coming gameweeks; each player shows that week's fixture, coloured by difficulty.
 - **Team planner** — below the pitch on Transfers: the XI and bench for any upcoming gameweek, following unconfirmed transfers (a player bought takes the sold player's slot). Swap players, move the armband, and save named plans (kept in the browser).
 - **Position-aware fixture difficulty** — each fixture is coloured 1 (easy) to 5 (hard) from team ratings based on team stats: attackers are rated against the opponent's defence, defenders against the opponent's attack, with separate home and away values.
@@ -21,9 +22,9 @@ npm run package    # build + zip for the Chrome Web Store -> release/
 ```
 
 - `src/content/` — content script: fixture strips on player rows, the Pick Team gameweek browser, the Transfers team planner, the injected Difficulty tab
-- `src/ui/` — fixture strip, gameweek stepper, season grid + ratings editor, shared difficulty colours, `i18n.ts` (English/Arabic text)
+- `src/ui/` — fixture strip, price-change badge, gameweek stepper, season grid + ratings editor, shared difficulty colours, `i18n.ts` (English/Arabic text)
 - `src/planner/` — lineup rules (swaps, armbands, following transfers) and saved plans
-- `src/api/` — the site's public API, plus the signed-in user's team (`myTeam.ts`)
+- `src/api/` — the site's public API, players' price history (`priceHistory.ts`), plus the signed-in user's team (`myTeam.ts`)
 - `src/fdr/schedule.ts` — remaining fixtures by team and open gameweek
 - `src/fdr/difficulty.ts` — difficulty lookup from team ratings
 - `src/fdr/ratingsStore.ts` — loads default ratings (bundled, then the repo copy) and the user's edits

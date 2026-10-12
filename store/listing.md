@@ -22,7 +22,10 @@ Unofficial SPL Fantasy helper: colour-coded fixtures on every player, a team pla
 Plan your SPL Fantasy transfers and captaincy faster — see every player's upcoming fixtures, how hard they are, and how your team lines up in the weeks ahead, right on the site.
 
 NEXT 5 FIXTURES ON EVERY PLAYER
-On the Pick Team and Transfers screens, each player gets a strip of their team's next five opponents. UPPERCASE = home, lowercase = away. No more clicking into each player to check who they play.
+On the Pick Team and Transfers screens, each player gets a strip of their team's next five gameweeks. UPPERCASE = home, lowercase = away. Double gameweeks show both opponents in that week's slot, so they're easy to spot. No more clicking into each player to check who they play.
+
+PRICE CHANGE ARROWS
+A small badge on each player's shirt shows which way his price last moved: green arrow up for a rise, red arrow down for a fall, grey if it hasn't changed this season. Hover it to see his current price.
 
 LOOK AHEAD TO ANY GAMEWEEK
 Step forward through the coming gameweeks on Pick Team: every player on your pitch shows who they face that week, colour-coded by difficulty. Spot the weak weeks before you pick your captain.
@@ -73,10 +76,10 @@ This is an unofficial, fan-made tool. It is not affiliated with, endorsed by or 
 ## Privacy practices tab
 
 **Single purpose:**
-Helps users plan their SPL Fantasy team: shows each player's upcoming fixtures and their difficulty directly on the SPL Fantasy website, a planner showing the user's team in upcoming gameweeks, and a full-season fixture difficulty table.
+Helps users plan their SPL Fantasy team: shows each player's upcoming fixtures and their difficulty, and which way his price last moved, directly on the SPL Fantasy website, a planner showing the user's team in upcoming gameweeks, and a full-season fixture difficulty table.
 
 **Permission justification — host permissions** (`fantasy.spl.com.sa`, `*.fantasy.spl.com.sa`):
-The extension adds fixture strips, a gameweek browser, a team planner and a difficulty table to SPL Fantasy pages. It reads the site's public fixtures and teams API to build them, and — on the Transfers page, for a signed-in user — the user's own team from the site, so the planner can show it. The toolbar page reads the same public API. It does not run on any other site.
+The extension adds fixture strips, price-change arrows, a gameweek browser, a team planner and a difficulty table to SPL Fantasy pages. It reads the site's public fixtures, teams and player price-history API to build them, and — on the Transfers page, for a signed-in user — the user's own team from the site, so the planner can show it. The toolbar page reads the same public API. It does not run on any other site.
 
 **Permission justification — storage:**
 Saves the user's own edits to the team difficulty ratings (a few numbers per team, synced across the user's devices via Chrome sync) and the team plans they choose to save (kept locally in the browser). Nothing is sent to the developer.

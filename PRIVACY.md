@@ -1,6 +1,6 @@
 # Privacy Policy — SPL Fantasy Helper
 
-_Last updated: 3 October 2026_
+_Last updated: 12 October 2026_
 
 SPL Fantasy Helper is an unofficial browser extension that adds fixture
 information and a team planner to the SPL Fantasy website (fantasy.spl.com.sa).
@@ -15,7 +15,8 @@ about you or your team is ever sent to us or to anyone else.
 ## What it reads on the SPL Fantasy website
 
 - **Fixtures, teams and players** — the site's public data, the same data the
-  site itself loads.
+  site itself loads, including the public price history of the players shown
+  on the page (to show which way each player's price last moved).
 - **Your own team, for the team planner** — when you are signed in to SPL
   Fantasy and open the Transfers page, the extension asks the site for your
   team (your players, their order on the bench, your captain). It does this
@@ -43,7 +44,7 @@ Removing the extension deletes all of it. None of it is ever sent to us.
 ## What network requests it makes
 
 - **The SPL Fantasy website** (`fantasy.spl.com.sa`) — its public teams,
-  players and fixtures, and, on the Transfers page while you are signed in,
+  players, fixtures and player price history, and, on the Transfers page while you are signed in,
   your own team as described above.
 - **This project's GitHub repository** (`raw.githubusercontent.com`) — a
   small file with the default team difficulty ratings.
