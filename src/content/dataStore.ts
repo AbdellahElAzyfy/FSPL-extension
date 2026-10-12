@@ -22,8 +22,6 @@ class DataStore {
   private scheduleData: Schedule | null = null;
   private seasonInput: SeasonGridInput | null = null;
   private loadPromise: Promise<void> | null = null;
-  /** The round players' event_points are for; null before the season starts. */
-  currentRound: number | null = null;
 
   load(): Promise<void> {
     if (!this.loadPromise) {
@@ -40,7 +38,6 @@ class DataStore {
     this.teamIdByCode = new Map(bootstrap.teams.map((t) => [t.code, t.id]));
     this.playersById = new Map(bootstrap.elements.map((p) => [p.id, p]));
     this.elementTypes = bootstrap.element_types;
-    this.currentRound = bootstrap.events.find((e) => e.is_current)?.id ?? null;
 
     for (const player of bootstrap.elements) {
       const key = `${player.team}|${player.web_name}`;

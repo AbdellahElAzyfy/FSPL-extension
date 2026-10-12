@@ -50,39 +50,6 @@
   color: #131924;
 }
 
-/* Season stats under the fixture strip, two rows of three. Same
-   edge-to-edge bleed as the strip. */
-.spl-fh-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  direction: ltr;
-  margin: 1px -10px -2px -10px;
-  padding: 2px 3px;
-  width: calc(100% + 20px);
-  box-sizing: border-box;
-  background: #131924;
-  color: #ffffff;
-}
-.spl-fh-stat {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  min-width: 0;
-  padding: 4px 2px;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-.spl-fh-stat svg {
-  flex: none;
-  width: 10px;
-  height: 10px;
-  fill: #b7f400;
-}
-
 /* Price-change arrow: a round badge at the shirt's lower left (on pitch cards
    the site's C/V badge sits lower right). Rows are position: relative. */
 .spl-fh-price {
