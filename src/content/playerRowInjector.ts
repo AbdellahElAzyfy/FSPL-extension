@@ -1,6 +1,5 @@
 import { dataStore } from "./dataStore";
 import { readPlayerRows } from "./pitch";
-import { fitPitchCards } from "./cardFit";
 import { pickTeamStartRound } from "./pickTeamRounds";
 import { renderFixtureStrip } from "../ui/fixtureStrip";
 import { renderPlayerStats, renderPriceBadge, setMinutesPerGame } from "../ui/playerStats";
@@ -30,7 +29,6 @@ export function scanForPlayerRows(): void {
   const startRound = pickTeamStartRound() ?? schedule?.firstRound?.id;
   if (!schedule || startRound === undefined) return;
   const model = getModel();
-  let changed = false;
 
   for (const { row, teamId, name, wearsGkShirt, nameEl } of readPlayerRows()) {
     const key = `${teamId}|${name}|${wearsGkShirt}|${startRound}`;
@@ -39,15 +37,10 @@ export function scanForPlayerRows(): void {
     row.querySelectorAll(ADDED_SELECTOR).forEach((el) => el.remove());
     row.setAttribute(STRIP_KEY_ATTR, key);
     coloredWith.set(row, model);
-    changed = true;
 
     const positionGroup = name ? dataStore.positionGroupFor(teamId, name, wearsGkShirt) : null;
     const rounds = schedule.roundsFrom(teamId, startRound, STRIP_LENGTH);
-    if (rounds.length > 0) {
-      const strip = renderFixtureStrip(rounds, positionGroup, model);
-      if (nameEl) strip.classList.add("spl-fh-fixture-strip--card");
-      row.appendChild(strip);
-    }
+    if (rounds.length > 0) row.appendChild(renderFixtureStrip(rounds, positionGroup, model));
 
     // Same-name teammates can't be told apart from the row: show no stats
     // rather than someone else's.
@@ -55,7 +48,6 @@ export function scanForPlayerRows(): void {
     if (candidates.length !== 1) continue;
     const player = candidates[0];
     const stats = renderPlayerStats(player, dataStore.currentRound);
-    if (nameEl) stats.classList.add("spl-fh-stats--card");
     row.appendChild(stats);
 
     playerHistory(player).then((history) => {
@@ -68,8 +60,4 @@ export function scanForPlayerRows(): void {
       row.appendChild(badge);
     });
   }
-
-  // A swap or transfer can move cards between lines, changing the room
-  // beside them.
-  if (changed) fitPitchCards();
 }

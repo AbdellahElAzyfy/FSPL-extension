@@ -6,21 +6,15 @@
   padding: 0 16px;
 }
 
-/* Negative margin bleeds past the row's padding (--fh-bleed) so the strip
-   spans the full player box edge-to-edge, and further where the cards have
-   room, so five chips stay readable. On pitch cards cardFit.ts sets the bleed
-   from the gap to the neighbouring cards; 10px is the default. */
-.spl-fh-fixture-strip,
-.spl-fh-stats {
-  --fh-bleed: 10px;
-}
+/* Negative margin bleeds past the row's own 10px side padding so the
+   strip spans the full player box edge-to-edge, not just its content area. */
 .spl-fh-fixture-strip {
   display: flex;
   /* Always read coming fixture -> later ones left to right, even on the RTL Arabic site. */
   direction: ltr;
   gap: 1px;
-  margin: 3px calc(-1 * var(--fh-bleed)) -2px;
-  width: calc(100% + 2 * var(--fh-bleed));
+  margin: 3px -10px -2px -10px;
+  width: calc(100% + 20px);
 }
 
 /* Pick Team round browser: bar above the pitch. */
@@ -56,16 +50,16 @@
   color: #131924;
 }
 
-/* Season stats under the fixture strip, two rows of three (three rows of two
-   on phones, see below). Same edge-to-edge bleed as the strip. */
+/* Season stats under the fixture strip, two rows of three. Same
+   edge-to-edge bleed as the strip. */
 .spl-fh-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   direction: ltr;
-  margin: 1px calc(-1 * var(--fh-bleed)) -2px;
-  padding: 2px 0;
-  width: calc(100% + 2 * var(--fh-bleed));
+  margin: 1px -10px -2px -10px;
+  padding: 2px 3px;
+  width: calc(100% + 20px);
   box-sizing: border-box;
   background: #131924;
   color: #ffffff;
@@ -76,7 +70,7 @@
   justify-content: center;
   gap: 3px;
   min-width: 0;
-  padding: 4px 0;
+  padding: 4px 2px;
   font-size: 10px;
   font-weight: 700;
   line-height: 1.2;
@@ -104,26 +98,10 @@
 .spl-fh-price[data-move="down"] { background: #d61f3a; }
 .spl-fh-price[data-move="none"] { background: #8a909a; }
 .spl-fh-price svg { width: 11px; height: 11px; fill: #ffffff; }
-/* Pitch cards: the shirt is centred at the top of the card and sized by the
-   site per breakpoint (same breakpoints as its shirt image "sizes"). */
 .spl-fh-price--card {
-  --shirt-w: 33px;
-  --shirt-h: 39px;
-  --badge: 14px;
   position: absolute;
-  top: calc(var(--shirt-h) - var(--badge));
-  left: calc(50% - var(--shirt-w) / 2 - var(--badge) + 3px);
-  width: var(--badge);
-  height: var(--badge);
-}
-.spl-fh-price--card svg { width: 9px; height: 9px; }
-@media (min-width: 610px) {
-  .spl-fh-price--card { --shirt-w: 44px; --shirt-h: 51px; --badge: 16px; }
-  .spl-fh-price--card svg { width: 10px; height: 10px; }
-}
-@media (min-width: 1024px) {
-  .spl-fh-price--card { --shirt-w: 55px; --shirt-h: 64px; --badge: 18px; }
-  .spl-fh-price--card svg { width: 11px; height: 11px; }
+  top: 44px;
+  left: 18px;
 }
 /* List rows: 24px shirt at 10px,10px. */
 .spl-fh-price--list {
@@ -159,24 +137,3 @@
   background-color: #e7e7e7;
   color: #131924;
 }
-
-/* Phones: pitch cards are ~64px wide, so five chips get ~15px each and the
-   stats only have room for two columns (list rows are wider and keep three). */
-@media (max-width: 609px) {
-  .spl-fh-fixture-strip--card .spl-fh-fixture-cell { font-size: 7.5px; letter-spacing: -0.4px; }
-  .spl-fh-stats--card { grid-template-columns: repeat(2, 1fr); padding: 1px 0; }
-  .spl-fh-stats--card .spl-fh-stat { padding: 3px 0; gap: 2px; font-size: 9px; }
-  .spl-fh-stats--card .spl-fh-stat svg { width: 9px; height: 9px; }
-}
-
-/* Tablets and small laptops: pitch cards are 105-120px wide, ~37-39px per
-   stat column; "44.4%" and its icon only fit with slightly smaller text. */
-@media (min-width: 610px) and (max-width: 1279px) {
-  .spl-fh-stat { gap: 2px; font-size: 9.5px; }
-}
-
-/* Cards crowded together on the narrowest phones (cardFit.ts): under ~14px
-   per chip and ~33px per stat column. */
-.spl-fh-tight .spl-fh-fixture-cell { font-size: 6px; letter-spacing: -0.5px; }
-.spl-fh-tight .spl-fh-stat { gap: 1px; font-size: 8px; }
-.spl-fh-tight .spl-fh-stat svg { width: 8px; height: 8px; }
