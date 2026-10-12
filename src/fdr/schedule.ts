@@ -45,17 +45,12 @@ export class Schedule {
     return this.byTeam.get(teamId)?.get(roundId) ?? [];
   }
 
-  /** A team's next `count` fixtures, starting at `fromRound`. */
-  fixturesFrom(teamId: number, fromRound: number, count: number): TeamFixture[] {
-    const result: TeamFixture[] = [];
-    for (const round of this.rounds) {
-      if (round.id < fromRound) continue;
-      for (const fixture of this.fixtures(teamId, round.id)) {
-        if (result.length === count) return result;
-        result.push(fixture);
-      }
-    }
-    return result;
+  /** A team's next `count` rounds from `fromRound`, each with its fixtures (none = blank, 2+ = double). */
+  roundsFrom(teamId: number, fromRound: number, count: number): { round: number; fixtures: TeamFixture[] }[] {
+    return this.rounds
+      .filter((r) => r.id >= fromRound)
+      .slice(0, count)
+      .map((r) => ({ round: r.id, fixtures: this.fixtures(teamId, r.id) }));
   }
 
   private add(teamId: number, roundId: number, fixture: TeamFixture): void {

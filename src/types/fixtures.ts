@@ -24,6 +24,18 @@ export interface Player {
   web_name: string;
   team: number;
   element_type: number;
+  /** Price in tenths (122 = 12.2). */
+  now_cost: number;
+  /** Price change since the season started / this round, in tenths. */
+  cost_change_start: number;
+  cost_change_event: number;
+  selected_by_percent: string; // "55.6"
+  total_points: number;
+  /** Points in the current (latest started) round. */
+  event_points: number;
+  goals_scored: number;
+  assists: number;
+  minutes: number;
 }
 
 /** A gameweek ("round" on this site). */
@@ -31,6 +43,8 @@ export interface GameEvent {
   id: number;
   finished: boolean;
   deadline_time: string;
+  /** The latest round whose deadline has passed. */
+  is_current: boolean;
 }
 
 /** A position. squad_min_play / squad_max_play bound how many may start. */

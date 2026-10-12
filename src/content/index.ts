@@ -2,6 +2,7 @@ import "./styles.css";
 import "../ui/fdrColors.css";
 import { dataStore } from "./dataStore";
 import { scanForPlayerRows } from "./playerRowInjector";
+import { fitPitchCards } from "./cardFit";
 import { ensureDifficultyTab } from "./difficultyTab";
 import { ensurePickTeamRounds } from "./pickTeamRounds";
 import { ensureTransferPlanner } from "./transferPlanner";
@@ -27,6 +28,17 @@ async function bootstrap(): Promise<void> {
 
   // Rating edits (here, in another tab, or a reset) recolour every strip at once.
   onRatingsChange(() => scanPage());
+
+  // The site resizes the pitch with the window without re-rendering the rows.
+  let fitQueued = false;
+  window.addEventListener("resize", () => {
+    if (fitQueued) return;
+    fitQueued = true;
+    requestAnimationFrame(() => {
+      fitQueued = false;
+      fitPitchCards();
+    });
+  });
 
   // SPA re-renders player rows and the nav on every navigation/filter
   // change, so keep re-scanning on DOM mutations. Swapping a player often
