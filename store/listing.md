@@ -64,7 +64,7 @@ This is an unofficial, fan-made tool. It is not affiliated with, endorsed by or 
 **Graphic assets:**
 - Store icon: `icons/icon128.png`
 - Screenshots (1280×800 JPEG, upload in this order; the store allows 5):
-  1. `store/screenshots/1-fixture-strips.jpeg` — Pick Team pitch with coloured strips (personal leagues sidebar replaced by a caption)
+  1. `store/screenshots/1-fixture-strips.jpeg` — Pick Team pitch with coloured strips and price-change arrows (personal leagues sidebar replaced by a caption with both legends)
   2. `store/screenshots/2-gameweek-browser.jpeg` — Pick Team browsed ahead to Gameweek 10
   3. `store/screenshots/3-team-planner.jpeg` — the team planner on Transfers, a player selected with swap targets highlighted
   4. `store/screenshots/4-difficulty-attackers.jpeg` — Difficulty tab, Attackers, next 5 rounds
