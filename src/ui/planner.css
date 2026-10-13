@@ -1,6 +1,7 @@
 /* Team planner on Transfers. Scoped under .spl-fh-planner: it lives inside the
    site, whose global styles we must neither leak into nor depend on. */
-.spl-fh-planner {
+.spl-fh-planner,
+.spl-fh-picker {
   --fh-bg: #131924;
   --fh-surface: #1c2433;
   --fh-surface-2: #252f41;
@@ -9,7 +10,8 @@
   --fh-muted: #9aa5b8;
   --fh-accent: #b7f400;
   --fh-warn: #ffb020;
-
+}
+.spl-fh-planner {
   /* Text follows the page (right-to-left on the Arabic site); fixture chips don't. */
   box-sizing: border-box;
   margin: 16px 0;
@@ -150,9 +152,12 @@
 
 .spl-fh-planner button[data-action="captain"],
 .spl-fh-planner button[data-action="vice"],
+.spl-fh-planner button[data-action="transfer-out"],
+.spl-fh-planner button[data-action="chip"],
 .spl-fh-planner button[data-action="deselect"],
 .spl-fh-planner button[data-action="close-plan"],
 .spl-fh-planner button[data-action="delete-plan"],
+.spl-fh-planner button[data-action="reset-live"],
 .spl-fh-planner__save button {
   padding: 6px 12px;
   border: 1px solid var(--fh-border);
@@ -166,11 +171,65 @@
 .spl-fh-planner button:disabled { opacity: 0.4; cursor: default; }
 .spl-fh-planner button[data-action="captain"]:hover:not(:disabled),
 .spl-fh-planner button[data-action="vice"]:hover:not(:disabled),
+.spl-fh-planner button[data-action="transfer-out"]:hover,
+.spl-fh-planner button[data-action="chip"]:hover,
 .spl-fh-planner button[data-action="deselect"]:hover,
 .spl-fh-planner button[data-action="close-plan"]:hover,
-.spl-fh-planner button[data-action="delete-plan"]:hover { border-color: var(--fh-accent); }
+.spl-fh-planner button[data-action="delete-plan"]:hover,
+.spl-fh-planner button[data-action="reset-live"]:hover { border-color: var(--fh-accent); }
+.spl-fh-planner button[data-action="reset-live"] { margin-top: 8px; }
 .spl-fh-planner__save button { background: var(--fh-accent); border-color: var(--fh-accent); color: var(--fh-bg); }
 .spl-fh-planner button[data-armed] { background: #8b1a26; border-color: #8b1a26; }
+
+.spl-fh-planner button[data-action="transfer-out"] { background: var(--fh-accent); border-color: var(--fh-accent); color: var(--fh-bg); }
+.spl-fh-planner button[data-action="chip"][aria-pressed="true"] { background: var(--fh-accent); border-color: var(--fh-accent); color: var(--fh-bg); }
+
+/* The gameweek: free transfers, hits, bank, chips and planned transfers */
+.spl-fh-planner__round {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--fh-surface-2);
+}
+.spl-fh-planner__stats { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.spl-fh-planner__stat { display: flex; flex-direction: column; }
+.spl-fh-planner__stat small,
+.spl-fh-planner__chips small { color: var(--fh-muted); font-size: 12px; }
+.spl-fh-planner__stat strong { font-size: 16px; }
+.spl-fh-planner__stat[data-warn] strong { color: var(--fh-warn); }
+.spl-fh-planner__chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.spl-fh-planner__chips small { margin-inline-end: 4px; }
+.spl-fh-planner__transfers { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.spl-fh-planner__transfers li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px 3px 10px;
+  border: 1px solid var(--fh-border);
+  border-radius: 999px;
+  background: var(--fh-bg);
+  font-size: 13px;
+}
+.spl-fh-planner__out { color: #ff8a8a; }
+.spl-fh-planner__in { color: var(--fh-accent); font-weight: 700; }
+.spl-fh-planner__arrow { color: var(--fh-muted); }
+[dir="rtl"] .spl-fh-planner__arrow { display: inline-block; transform: scaleX(-1); }
+.spl-fh-planner button[data-action="undo-transfer"] {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--fh-muted);
+  cursor: pointer;
+}
+.spl-fh-planner button[data-action="undo-transfer"]:hover { background: var(--fh-surface-2); color: var(--fh-text); }
+.spl-fh-planner__problem { margin: 0; color: var(--fh-warn); font-size: 13px; font-weight: 600; }
+.spl-fh-planner__round .spl-fh-planner__hint { margin: 0; }
 
 /* Saved plans */
 .spl-fh-planner__plans { padding-top: 12px; border-top: 1px solid var(--fh-border); }
@@ -216,3 +275,99 @@
   .spl-fh-pcard { width: 64px; }
   .spl-fh-planner__line, .spl-fh-planner__bench { gap: 2px; }
 }
+
+/* Transfer picker: an overlay over the whole page, appended to <body>. */
+.spl-fh-picker {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 8, 14, 0.7);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.spl-fh-picker *, .spl-fh-picker *::before, .spl-fh-picker *::after { box-sizing: border-box; }
+.spl-fh-picker button, .spl-fh-picker input, .spl-fh-picker select { font: inherit; }
+.spl-fh-picker__dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  padding: 16px;
+  border: 1px solid var(--fh-border);
+  border-radius: 12px;
+  background: var(--fh-surface);
+  color: var(--fh-text);
+  text-align: start;
+}
+.spl-fh-picker__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.spl-fh-picker h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--fh-text); }
+.spl-fh-picker .spl-fh-planner__hint { margin: 2px 0 0; color: var(--fh-muted); font-size: 13px; }
+.spl-fh-picker__close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--fh-border);
+  border-radius: 50%;
+  background: var(--fh-surface-2);
+  color: var(--fh-text);
+  cursor: pointer;
+}
+.spl-fh-picker__controls { display: flex; gap: 8px; margin: 12px 0 8px; }
+.spl-fh-picker__controls input,
+.spl-fh-picker__controls select {
+  padding: 6px 10px;
+  border: 1px solid var(--fh-border);
+  border-radius: 6px;
+  background: var(--fh-bg);
+  color: var(--fh-text);
+}
+.spl-fh-picker__controls input { flex: 1 1 auto; min-width: 0; }
+.spl-fh-picker input:focus-visible,
+.spl-fh-picker select:focus-visible,
+.spl-fh-picker button:focus-visible { outline: 2px solid var(--fh-accent); outline-offset: 1px; }
+.spl-fh-picker__list { overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.spl-fh-picker__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px 44px 56px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fh-text);
+  text-align: start;
+  cursor: pointer;
+}
+.spl-fh-picker__row:hover:not(:disabled) { background: var(--fh-surface-2); }
+.spl-fh-picker__row:disabled { opacity: 0.4; cursor: default; }
+.spl-fh-picker__row--head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--fh-surface);
+  color: var(--fh-muted);
+  font-size: 12px;
+  cursor: default;
+}
+.spl-fh-picker__who { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.spl-fh-picker__who strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spl-fh-picker__who small { color: var(--fh-muted); }
+.spl-fh-picker__fixtures { display: flex; gap: 2px; direction: ltr; }
+.spl-fh-picker__slot { display: flex; flex: 1 1 0; gap: 1px; }
+.spl-fh-picker__chip {
+  flex: 1 1 0;
+  padding: 2px 0;
+  border-radius: 3px;
+  background-color: #e7e7e7;
+  color: var(--fh-bg);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+}
+.spl-fh-picker__row--head .spl-fh-picker__fixtures { direction: inherit; }
+.spl-fh-picker__pts, .spl-fh-picker__price { text-align: end; font-variant-numeric: tabular-nums; }
+.spl-fh-picker__price { font-weight: 700; }

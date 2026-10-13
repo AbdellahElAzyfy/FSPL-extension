@@ -28,6 +28,9 @@ export interface Player {
   now_cost: number;
   /** Price change since the season started, in tenths. */
   cost_change_start: number;
+  total_points: number;
+  /** "u" = unavailable (e.g. left the league); such players can't be bought. */
+  status: string;
 }
 
 /** A gameweek ("round" on this site). */

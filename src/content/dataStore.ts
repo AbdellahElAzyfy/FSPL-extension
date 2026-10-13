@@ -71,6 +71,11 @@ class DataStore {
     return this.playersById.get(playerId);
   }
 
+  /** Every player in the game. */
+  players(): Iterable<Player> {
+    return this.playersById.values();
+  }
+
   elementType(typeId: number): ElementType | undefined {
     return this.elementTypes.find((t) => t.id === typeId);
   }
