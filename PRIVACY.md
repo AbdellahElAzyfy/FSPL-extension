@@ -1,6 +1,6 @@
 # Privacy Policy — SPL Fantasy Helper
 
-_Last updated: 12 October 2026_
+_Last updated: 13 October 2026_
 
 SPL Fantasy Helper is an unofficial browser extension that adds fixture
 information and a team planner to the SPL Fantasy website (fantasy.spl.com.sa).
@@ -21,7 +21,10 @@ about you or your team is ever sent to us or to anyone else.
   Fantasy and open the Transfers page, the extension asks the site for your
   team (your players, their order on the bench, your captain). It does this
   the same way the site does, through your existing login session; it never
-  sees or handles your password. The site's answer also includes your account
+  sees or handles your password. The answer also includes what each player
+  would sell for, the money in your bank, your free transfers and which chips
+  you have left — the planner uses these to work out your budget, points hits
+  and the chips you can still play. The site's answer also includes your account
   details such as your name and email address — the extension ignores them and
   uses only your team ID. Your team is used only to draw the planner in your
   browser.
@@ -34,9 +37,11 @@ Everything is stored with Chrome's built-in extension storage, on your device:
   values (numbers from 1 to 5 per team) are saved in `chrome.storage.sync`. If
   you're signed in to Chrome with sync turned on, Chrome syncs them across your
   own devices. Use "Reset all to default" in the ratings editor to delete them.
-- **Your saved plans** — if you save a plan in the team planner, its name, the
-  players in it (as player IDs), your lineup and captain, and your team ID are
-  saved in `chrome.storage.local`, in this browser only. Use "Delete" next to a
+- **Your plans** — what you plan in the team planner (for each gameweek: the
+  transfers as player IDs, the chip, your lineup and captain) is saved with your
+  team ID in `chrome.storage.local`, in this browser only: the plan you're
+  working on, so it survives a reload, and any plans you save by name. Use
+  "Start over" to clear the plan you're working on and "Delete" next to a saved
   plan to remove it.
 
 Removing the extension deletes all of it. None of it is ever sent to us.
