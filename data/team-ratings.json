@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-01",
+  "updatedAt": "2026-10-14",
   "teams": [
     {
       "splTeamId": 1,
@@ -57,7 +57,7 @@
         "away": 2
       },
       "defence": {
-        "home": 4,
+        "home": 3,
         "away": 3
       }
     },
@@ -114,18 +114,18 @@
       "shortName": "SHB",
       "attack": {
         "home": 3,
-        "away": 2
+        "away": 3
       },
       "defence": {
-        "home": 2,
-        "away": 2
+        "home": 3,
+        "away": 3
       }
     },
     {
       "splTeamId": 11,
       "shortName": "TWN",
       "attack": {
-        "home": 3,
+        "home": 2,
         "away": 2
       },
       "defence": {
@@ -149,11 +149,11 @@
       "splTeamId": 13,
       "shortName": "KLD",
       "attack": {
-        "home": 4,
+        "home": 3,
         "away": 3
       },
       "defence": {
-        "home": 4,
+        "home": 3,
         "away": 3
       }
     },
@@ -162,10 +162,10 @@
       "shortName": "NEO",
       "attack": {
         "home": 3,
-        "away": 2
+        "away": 3
       },
       "defence": {
-        "home": 5,
+        "home": 4,
         "away": 4
       }
     },
@@ -189,8 +189,8 @@
         "away": 1
       },
       "defence": {
-        "home": 3,
-        "away": 3
+        "home": 2,
+        "away": 2
       }
     },
     {
@@ -213,7 +213,7 @@
         "away": 3
       },
       "defence": {
-        "home": 5,
+        "home": 4,
         "away": 4
       }
     }
