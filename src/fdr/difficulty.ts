@@ -5,6 +5,9 @@ export type Difficulty = 1 | 2 | 3 | 4 | 5;
 /** Which side of the opponent matters: its defence (for ATT/MID) or its attack (for GK/DEF). */
 export type PositionGroup = "attacking" | "defensive";
 
+/** What the season grid rates fixtures for: one position group, or both averaged. */
+export type FdrView = PositionGroup | "general";
+
 export function isDifficulty(value: unknown): value is Difficulty {
   return typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 5;
 }
@@ -30,6 +33,14 @@ export class DifficultyModel {
     // Ratings are stored from the rated (opponent) team's venue.
     const venue = playerIsHome ? "away" : "home";
     return this.rating(opponentId, group === "attacking" ? `defence.${venue}` : `attack.${venue}`);
+  }
+
+  /** Like getDifficulty, but "general" is the exact average of the attacking and defensive difficulty (can be x.5). */
+  getScore(opponentId: number, playerIsHome: boolean, view: FdrView): number | null {
+    if (view !== "general") return this.getDifficulty(opponentId, playerIsHome, view);
+    const attacking = this.getDifficulty(opponentId, playerIsHome, "attacking");
+    const defensive = this.getDifficulty(opponentId, playerIsHome, "defensive");
+    return attacking && defensive ? (attacking + defensive) / 2 : null;
   }
 
   rating(teamId: number, key: RatingKey): Difficulty | null {

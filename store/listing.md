@@ -51,7 +51,7 @@ Disagree with a rating? Click "Edit ratings" on the Difficulty tab and set any t
 
 FULL-SEASON DIFFICULTY TABLE
 A new "Difficulty" tab in the site's menu shows every team's fixtures for the rest of the season in one colour-coded grid:
-• Switch between attacker and defender ratings.
+• Switch between attacker and defender ratings, or a general view that averages the two.
 • View the next 5 rounds, the next 10, or the rest of the season.
 • Teams are sorted easiest run first — spot fixture swings and plan transfers ahead.
 You can also open the table from the extension's toolbar icon.

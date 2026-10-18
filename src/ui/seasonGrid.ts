@@ -1,6 +1,6 @@
 import "./seasonGrid.css";
 import "./fdrColors.css";
-import type { Difficulty, DifficultyModel, PositionGroup } from "../fdr/difficulty";
+import type { Difficulty, DifficultyModel, FdrView } from "../fdr/difficulty";
 import {
   exportRatingsJson,
   getModel,
@@ -31,7 +31,7 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
   const schedule = new Schedule(input.teams, input.events, input.fixtures);
   const rounds = schedule.rounds;
 
-  const state = { group: "attacking" as PositionGroup, horizon: "5", editing: false };
+  const state = { group: "attacking" as FdrView, horizon: "5", editing: false };
   // Editor: whether a team's home & away values move together, per "teamId|side".
   // Starts linked when the two values are equal.
   const linked = new Map<string, boolean>();
@@ -48,6 +48,7 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
         <div class="spl-fh-season__segmented" role="radiogroup" aria-label="${t("Rate fixtures for", "تقييم المباريات لـ")}">
           <button type="button" role="radio" data-group="attacking" aria-checked="true">${t("Attackers", "الهجوم")} <span>${t("MID / FWD", "وسط / مهاجم")}</span></button>
           <button type="button" role="radio" data-group="defensive" aria-checked="false">${t("Defenders", "الدفاع")} <span>${t("GK / DEF", "حارس / مدافع")}</span></button>
+          <button type="button" role="radio" data-group="general" aria-checked="false">${t("General", "عام")} <span>${t("avg of both", "معدل الاثنين")}</span></button>
         </div>
         <label class="spl-fh-season__horizon">
           ${t("Show", "عرض")}
@@ -116,10 +117,11 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
     const shown = state.horizon === "all" ? rounds : rounds.slice(0, Number(state.horizon));
 
     const rows = input.teams.map((team) => {
-      const ratings: Difficulty[] = [];
+      const ratings: number[] = [];
       const cells = shown.map((round) =>
         schedule.fixtures(team.id, round.id).map((cell) => {
-          const rating = model.getDifficulty(cell.opponent.id, cell.isHome, state.group);
+          // General can land on x.5: the Avg column uses the exact value, the chip colour rounds it.
+          const rating = model.getScore(cell.opponent.id, cell.isHome, state.group);
           if (rating) ratings.push(rating);
           return { ...cell, rating };
         }),
@@ -163,7 +165,7 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
         for (const { opponent, isHome, rating } of fixtures) {
           const chip = document.createElement("span");
           chip.className = "spl-fh-season__chip spl-fh-fdr";
-          if (rating) chip.dataset.fdr = String(rating);
+          if (rating) chip.dataset.fdr = String(Math.round(rating));
           chip.textContent = isHome ? opponent.short_name.toUpperCase() : opponent.short_name.toLowerCase();
           chip.title =
             (isHome
@@ -306,7 +308,7 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
   const radios = root.querySelectorAll<HTMLButtonElement>(".spl-fh-season__segmented button");
   radios.forEach((button) =>
     button.addEventListener("click", () => {
-      state.group = button.dataset.group as PositionGroup;
+      state.group = button.dataset.group as FdrView;
       radios.forEach((b) => b.setAttribute("aria-checked", String(b === button)));
       render();
     }),
