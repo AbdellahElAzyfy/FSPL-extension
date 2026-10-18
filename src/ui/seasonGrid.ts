@@ -22,7 +22,7 @@ export interface SeasonGridInput {
 
 /**
  * Full-season fixture difficulty grid: every team x every remaining round,
- * coloured for attackers or defenders, sorted easiest first — plus an editor
+ * coloured for attackers, defenders or both, sorted easiest run first — plus an editor
  * for the team ratings behind it. Self-contained (own controls and scoped
  * styles) so it can be mounted in the extension's own page or inside the SPL
  * Fantasy site. Re-renders whenever the ratings change.
@@ -70,8 +70,8 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
       <i class="spl-fh-fdr" data-fdr="5">5</i>
       <span>${t("Hard", "صعبة")}</span>
       <span class="spl-fh-season__note">${t(
-        "UPPERCASE = home, lowercase = away · sorted easiest first",
-        "الأحرف الكبيرة = على الأرض، الصغيرة = خارج الأرض · الأسهل أولًا",
+        "UPPERCASE = home, lowercase = away · sorted easiest run first: doubles count twice, blanks count nothing",
+        "الأحرف الكبيرة = على الأرض، الصغيرة = خارج الأرض · الأسهل أولًا: الجولة المزدوجة تُحسب مرتين، والجولة بلا مباراة لا تُحسب",
       )}</span>
     </div>
     <div class="spl-fh-season__editor" hidden>
@@ -117,23 +117,29 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
     const shown = state.horizon === "all" ? rounds : rounds.slice(0, Number(state.horizon));
 
     const rows = input.teams.map((team) => {
-      const ratings: number[] = [];
+      // Run score, like the planner's fixture sort: each fixture adds 6 - difficulty
+      // (higher = easier), so a double counts twice and a blank adds nothing.
+      let score = 0;
       const cells = shown.map((round) =>
         schedule.fixtures(team.id, round.id).map((cell) => {
-          // General can land on x.5: the Avg column uses the exact value, the chip colour rounds it.
+          // General can land on x.5: the score uses the exact value, the chip colour rounds it.
           const rating = model.getScore(cell.opponent.id, cell.isHome, state.group);
-          if (rating) ratings.push(rating);
+          score += 6 - (rating ?? 3);
           return { ...cell, rating };
         }),
       );
-      const avg = ratings.length ? ratings.reduce((s, r) => s + r, 0) / ratings.length : Infinity;
-      return { team, cells, avg };
+      return { team, cells, score };
     });
-    rows.sort((a, b) => a.avg - b.avg || a.team.name.localeCompare(b.team.name));
+    rows.sort((a, b) => b.score - a.score || a.team.name.localeCompare(b.team.name));
 
     grid.replaceChildren();
     const head = grid.createTHead().insertRow();
-    head.append(th(t("Team", "الفريق"), "spl-fh-season__team"), th(t("Avg", "المعدل"), "spl-fh-season__avg"));
+    const scoreHead = th(t("Score", "النقاط"), "spl-fh-season__avg");
+    scoreHead.title = t(
+      "Fixture run score, higher = easier: each fixture adds 6 minus its difficulty (a 1 adds 5, a 5 adds 1). Doubles count twice, blanks add nothing.",
+      "تقييم سلسلة المباريات، الأعلى = الأسهل: كل مباراة تضيف 6 ناقص صعوبتها (الصعوبة 1 تضيف 5، والصعوبة 5 تضيف 1). الجولة المزدوجة تُحسب مرتين، والجولة بلا مباراة لا تضيف شيئًا.",
+    );
+    head.append(th(t("Team", "الفريق"), "spl-fh-season__team"), scoreHead);
     for (const round of shown) {
       const cell = th(`R${round.id}`); // "R8" in Arabic too (user's choice)
       const date = document.createElement("small");
@@ -151,7 +157,7 @@ export function createSeasonGrid(input: SeasonGridInput): HTMLElement {
 
       const avg = tr.insertCell();
       avg.className = "spl-fh-season__avg";
-      avg.textContent = Number.isFinite(row.avg) ? row.avg.toFixed(2) : "–";
+      avg.textContent = String(row.score); // whole, or x.5 in the General view
 
       for (const fixtures of row.cells) {
         const td = tr.insertCell();
